@@ -7,21 +7,17 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from Testcase import Testcase
+from test_case import Testcase
+import json
 
 class testcase_loader():
     def __init__(self, object_file):
         filehandler = open(object_file, 'r')
         self.payloads = []
-        for line in filehandler:
-            line = line.replace("+---------------------------------------------------------+", "")
-            line = line.replace("REPRODUCE_KEY:", "")
-            line = line.replace("\n", "")
-            if line != "":
-                _tmp = Testcase(0)
-                _tmp.load_bas64_strings(line)
-                self.payloads.append(_tmp)
 
+        loaded_payloads = json.load(filehandler)
+        for p in loaded_payloads:
+          self.payloads.apped(test_case.from_json(p))
         print "[*] " + str(len(self.payloads)) + " testcase in file \"" + object_file + "\""
 
     def get_number_of_elements(self):

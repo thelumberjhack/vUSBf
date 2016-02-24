@@ -56,6 +56,7 @@ class usb_emulator:
     def setup_payload(self, payload):
 
         data = usbdescFileParser(config.DEV_DESC_FOLDER + payload.get_option("descriptor")).parse()
+        print "Payload: " + str(data[0])
         self.payload = data[0]
         self.if_info_packet = data[3]
         self.ep_info_packet = data[4]

@@ -8,16 +8,23 @@
 __author__ = 'Sergej Schumilo'
 
 import base64
+import json
 import os
 import sys
 sys.path.append(os.path.abspath('../'))
 import config
 
+def deserialize(j_obj):
+  def make_fuzzing_instruction(obj):
+    return Fuzzing_instruction(obj["value"], obj["field"], obj["packet_type"])
+  fuzzing_instructions = map(make_fuzzing_instruction, j_obj["fuzzing_instructions"])
+  return Testcase(j_obj["ID"], fuzzing_instructions, j_obj["options"])
+
 class Testcase(object):
-    def __init__(self, ID):
+    def __init__(self, ID, fuzzing_instructions = [], option = {}):
         self.ID = ID
-        self.list = []
-        self.option = {}
+        self.list = fuzzing_instructions
+        self.option = option
 
     def S(*x):
         if len(x) == 1 and type(x[0]) == list:
@@ -33,10 +40,26 @@ class Testcase(object):
         else:
             self.list.extend(testcase)
 
+    def serialize_obj(self):
+       """Serialize this class and sub classes"""
+       def objectify_fuzzing_instr(fuzzing_instr):
+         return {
+            "value" : fuzzing_instr.value,
+            "field" : fuzzing_instr.field,
+            "packet_type" : fuzzing_instr.packet_type
+         }
+
+       obj =  {
+         "ID" : self.ID,
+         "fuzzing_instructions": map(objectify_fuzzing_instr, self.list),
+         "options" : self.option
+       }
+       return obj
+
     def print_message(self):
         message = "Test #" + str(self.ID) + ":\n"
         message += "+---------------------------------------------------------+\n"
-        if config.PRINT_VERBOSE_TEST_INFO:
+        if True:
             for e in self.list:
                 message += "\t" + e.gen_info_string() + "\n"
             message += str(self.option) + "\n"
@@ -154,12 +177,3 @@ if __name__ == "__main__":
     testcase.add_option(2, "Zwei")
     testcase.add_option(3, "Drei")
 
-    #print testcase.get_option(1)
-    #print testcase.get_option(2)
-    #print testcase.get_option(3)
-    #print testcase.encode_base64()
-    #print testcase.decode_base64(testcase.encode_base64())
-    print testcase.print_message()
-    t2 = Testcase(0)
-    t2.load_bas64_strings(testcase.encode_base64())
-    print t2
