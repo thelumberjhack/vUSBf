@@ -4,7 +4,7 @@
                 <testcase name="testcase_1"/>
                 <option emulator="enumeration" descriptor="desc9.txt"/>
         </execute>
-        
+
         <execute name="ex2">
                 <testcase name="testcase_3"/>
                 <option emulator="enumeration" descriptor="desc2.txt"/>

@@ -305,13 +305,13 @@ descriptor_types = { 0x01: usb_device_descriptor,
 			0x02: usb_configuration_descriptor,
 			0x03: usb_string_descriptor,
 			0x04: usb_interface_descriptor,
-			0x05: usb_endpoint_descriptor,		
+			0x05: usb_endpoint_descriptor,
 			0x09: usb_hid_descriptor
 			}
-			
+
 
 ## PROTOTYPE FOR USB_HUB_DESCRIPTOR ##
-## 
+##
 ## typedef struct _USB_HUB_DESCRIPTOR {
 ##  UCHAR  bDescriptorLength;
 ##  UCHAR  bDescriptorType;
@@ -326,7 +326,7 @@ descriptor_types = { 0x01: usb_device_descriptor,
 
 ##############################################
 ####### USB MASSSTORAGE SPECIFIC STUFF #######
-###### 	SCSI			       ####### 
+###### 	SCSI			       #######
 ##############################################
 
 # dCBWSignatur
@@ -349,7 +349,7 @@ class massstorage_cbw(Packet):
 				ByteField("bmCBWFlags", None),
 				ByteField("bCBWLUN", None),
 				ByteField("bCBWCBLength", None)
-				]  
+				]
 
 # Command Status Wrapper (CSW)
 class massstorage_csw(Packet):
@@ -373,7 +373,7 @@ SCSI_INQUIRY_PRODUCT_REVISION_LEVEL_LENGTH = 4
 class scsi_inquiry(Packet):
 		name = "SCSI_Inquiry"
 		fields_desc = [	ByteField("peripheral", None),
-				ByteField("RMB", None), 
+				ByteField("RMB", None),
 				ByteField("version", None),
 				ByteField("?", None),
 				ByteField("additional_length", None),
@@ -417,7 +417,7 @@ class scsi_read_capicity(Packet):
 		fields_desc = [ XLEIntField("returned_logic_block_addr", None),
 						XLEIntField("block_length", None) ]
 
-# MODE SELECT (6) SCSI RESPONSE 
+# MODE SELECT (6) SCSI RESPONSE
 class scsi_mode_6(Packet):
 		name = "SCSI_MODE_SELECT_(6)_RESPONSE"
 		fields_desc = [	ByteField("mode_data_length", None),

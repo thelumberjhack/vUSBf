@@ -10,7 +10,7 @@ __author__ = 'Sergej Schumilo'
 # monitor specific ######
 # serial port read timeout (select timeout)
 SERIAL_READ_TIMEOUT = 0.45
-# maximal number of lines reading in 
+# maximal number of lines reading in
 SERIAL_READ_MAX_LINES = 1024
 # maximal number of read retries
 SERIAL_READ_RETRIES = 1
@@ -57,7 +57,7 @@ PROCESS_SLOW_START_THRESHOLD_FAIL_COUNTER = 100
 PROCESS_REPAIR_SEMAPHORE = 5
 
 # debug specific ######
-# define verbose level distinctions 
+# define verbose level distinctions
 VERBOSE_LEVEL_PRINT_ERROR_MESSAGES = 4
 VERBOSE_LEVEL_PRINT_RECV_DATA = 3
 VERBOSE_LEVEL_PRINT_SEND_DATA = 2
