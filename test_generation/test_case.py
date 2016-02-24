@@ -56,47 +56,6 @@ class Testcase(object):
        }
        return obj
 
-    def print_message(self):
-        message = "Test #" + str(self.ID) + ":\n"
-        message += "+---------------------------------------------------------+\n"
-        if True:
-            for e in self.list:
-                message += "\t" + e.gen_info_string() + "\n"
-            message += str(self.option) + "\n"
-        message += "REPRODUCE_KEY:\n" + self.encode_base64() + "\n"
-        message += "+---------------------------------------------------------+\n"
-
-        return message
-
-    def encode_base64(self):
-        message = str(self.ID) + "\n"
-        message += "\n"
-        for e in self.list:
-            message += e.gen_info_string().replace("FT: ", "").replace("\t", " ").replace(":", "") + "\n"
-        message += "\n"
-        for k in self.option.keys():
-            message += k
-            message += " " + self.option[k] + "\n"
-        return base64.b64encode(message.replace(" ", "\xff"))
-
-    def decode_base64(self, data):
-        return base64.b64decode(data).replace("\xff", " ")
-
-    def load_bas64_strings(self, data):
-        data = base64.b64decode(data).split("\n\n")
-        try:
-            self.ID = int(data[0], 10)
-        except:
-            self.ID = data[0]
-        for e in data[1].split("\n"):
-            _tmp = e.split("\xff")
-            if len(_tmp) == 3:
-                self.add_testcase(Fuzzing_instruction(int(_tmp[0],10), _tmp[1], _tmp[2]))
-        for e in data[2].split("\n"):
-            _tmp = e.split("\xff")
-            if len(_tmp) == 2:
-                self.add_option(_tmp[0], _tmp[1])
-
     def get_ID(self):
         return self.ID
 
@@ -125,7 +84,7 @@ class Testcase(object):
         return self.option.keys()
 
     def __str__(self):
-        return self.print_message()
+        return json.dumps(self.serialize_obj(), indent = 2)
 
 
 class Instruction(object):

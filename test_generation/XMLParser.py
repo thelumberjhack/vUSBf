@@ -15,7 +15,7 @@ __author__ = 'Sergej Schumilo'
 
 import xml.etree.ElementTree as ET
 from Sequence import *
-from Testcase import *
+from test_case import *
 
 EX_TAG = "execute"
 EX_NAME = "name"

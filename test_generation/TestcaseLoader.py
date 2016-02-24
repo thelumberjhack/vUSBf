@@ -7,7 +7,11 @@
 """
 __author__ = 'Sergej Schumilo'
 
+
+import sys
+import os
 from test_case import Testcase
+import test_case
 import json
 
 class testcase_loader():
@@ -17,7 +21,8 @@ class testcase_loader():
 
         loaded_payloads = json.load(filehandler)
         for p in loaded_payloads:
-          self.payloads.apped(test_case.from_json(p))
+          self.payloads.append(test_case.deserialize(p))
+
         print "[*] " + str(len(self.payloads)) + " testcase in file \"" + object_file + "\""
 
     def get_number_of_elements(self):
