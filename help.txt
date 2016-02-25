@@ -43,16 +43,16 @@ Extras:
 
 Example:
 
-	LIST ALL AVAILABLE PAYLOADS:
-		python vusbf.py -l 
-	SEND PAYLOAD TO EXTERNAL QEMU INSTANCE:
-		python vusbf.py -eon 127.0.0.1 1235 panic_1.obj
-	EXECUTE PAYLOAD:
-		python vusbf.py -eo panic_1.obj -o ubuntu1404.config -v1
-	RUN SINGLECORE MODE (EXTERN VM):
-		python vusbf.py -sp 127.0.0.1 1235 -e ex2
-	RUN SINGLECORE MODE:
-		python vusbf.py -r -e ex1 -o ubuntu1404.config -rl
-	RUN MULTICORE MODE (20 PROCESSES):
-		python vusbf.py -rm -p 20 -e ex1 -o ubuntu1404.config -rl
+        LIST ALL AVAILABLE PAYLOADS:
+                python vusbf.py -l
+        SEND PAYLOAD TO EXTERNAL QEMU INSTANCE:
+                python vusbf.py -eon 127.0.0.1 1235 panic_1.obj
+        EXECUTE PAYLOAD:
+                python vusbf.py -eo panic_1.obj -o ubuntu1404.config -v1
+        RUN SINGLECORE MODE (EXTERN VM):
+                python vusbf.py -sp 127.0.0.1 1235 -e ex2
+        RUN SINGLECORE MODE:
+                python vusbf.py -r -e ex1 -o ubuntu1404.config -rl
+        RUN MULTICORE MODE (20 PROCESSES):
+                python vusbf.py -rm -p 20 -e ex1 -o ubuntu1404.config -rl
 
