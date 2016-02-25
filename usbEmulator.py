@@ -8,6 +8,7 @@
 __author__ = 'Sergej Schumilo'
 
 from usbscapy import *
+from usbparser import *
 import scapy
 from scapy.packet import bind_layers, split_layers, Raw
 from lsusb_description_parser import LinuxLSUSBDescriptionParser
@@ -58,13 +59,6 @@ class usb_emulator:
     def setup_payload(self, payload):
 
         data = LinuxLSUSBDescriptionParser(config.DEV_DESC_FOLDER + payload.get_option("descriptor")).parse()
-
-        for e in data:
-          if e is None: continue
-          for j in e:
-            if type(j) is list:
-              print j
-            print j.__class__
 
         self.payload = data[0]
         self.if_info_packet = data[3]
