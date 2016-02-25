@@ -183,12 +183,17 @@ class data_interrupt_redir_header(Packet):
                    LEShortField("length", 0)]
 
 
-redir_specific_type = [[0, hello_redir_header],
-                       [1, connect_redir_header],
-                       [100, data_control_redir_header],
-                       [101, data_bulk_redir_header],
-                       [102, data_iso_redir_header],
-                       [103, data_interrupt_redir_header]]
+redir_specific_type = {
+                       0: hello_redir_header,
+                       1: connect_redir_header,
+                       100: data_control_redir_header,
+                       101: data_bulk_redir_header,
+                       102: data_iso_redir_header,
+                       103: data_interrupt_redir_header
+                      }
+
+for redir_type_id, redir_control_pkg in redir_specific_type.iteritems():
+  bind_layers( usbredirheader, redir_control_pkg, Htype = redir_type_id)
 
 
 ##################################
