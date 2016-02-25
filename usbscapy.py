@@ -62,6 +62,27 @@ usbredir_type_enum = {  # CONTROL PACKETS
                         102: "data_iso_packet",
                         103: "data_interrupt_packet"}
 
+
+usbredir_caps_enum = {
+    # Supports USB 3 bulk streams
+    0: "usb_redir_cap_bulk_streams",
+    # The device_connect packet has the device_version_bcd field
+    1: "usb_redir_cap_connect_device_version",
+    # Supports usb_redir_filter_reject and usb_redir_filter_filter pkts
+    2: "usb_redir_cap_filter",
+    # Supports the usb_redir_device_disconnect_ack packet
+    3: "usb_redir_cap_device_disconnect_ack",
+    # The ep_info packet has the max_packet_size field
+    4: "usb_redir_cap_ep_info_max_packet_size",
+    # Supports 64 bits ids in usb_redir_header
+    5: "usb_redir_cap_64bits_ids",
+    # Supports 32 bits length in usb_redir_bulk_packet_header
+    6: "usb_redir_cap_32bits_bulk_length",
+    # Supports bulk receiving / buffered bulk input
+    7: "usb_redir_cap_bulk_receiving",
+};
+
+
 # DO NOT FUZZ THE FOLLOWING REDIR SPECIFIC PACKAGES! FUZZING WILL CAUSE IN QEMU CRASH!
 class usbredirheader(Packet):
     name = "UsbredirPacket"
