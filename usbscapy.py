@@ -8,7 +8,6 @@
 __author__ = 'Sergej Schumilo'
 
 import struct
-from scapy.all import *
 from scapy.fields import *
 from scapy.packet import *
 
@@ -197,8 +196,8 @@ redir_specific_type = {
 
 
 #Layer binding doesn't appear to be working properly
-for redir_type_id, redir_control_pkg in redir_specific_type.iteritems():
-  bind_layers( usbredirheader, redir_control_pkg, Htype = redir_type_id)
+#for redir_type_id, redir_control_pkg in redir_specific_type.iteritems():
+#  bind_layers( usbredirheader, redir_control_pkg, Htype = redir_type_id)
 
 
 ##################################
@@ -646,4 +645,18 @@ SCSI_COMMAND_LIST = [   ['\x04', "FORMAT UNIT", None],
                                                 ['\x2a', "WRITE (10)", None],
                                                 ['\xaa', "WRITE (12)", None]
                                 ]
+
+
+
+def main():
+    # my code here
+  blah = usbredirheader() / hello_redir_header()
+  blah.show()
+
+  print str(blah)
+#  usbredirheader(str(blah)).show()
+
+if __name__ == "__main__":
+    main()
+
 
