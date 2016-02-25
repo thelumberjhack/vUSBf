@@ -36,7 +36,7 @@ DEV_DESC_FOLDER = "dev_desc/"
 # unix socket timeout
 UNIX_SOCKET_TIMEOUT = 0.5
 # tcp socket timeout
-TCP_SOCKET_TIMEOUT = 0.75
+TCP_SOCKET_TIMEOUT = 20
 # connection to victim timeout
 # (Linux: 0.2 - 0,75 / FreeBSD: 1.25 - 2.0)
 CONNECTION_TO_VICTIM_TIMEOUT = 1.35
@@ -65,7 +65,7 @@ VERBOSE_LEVEL_PRINT_INFO = 1
 VERBOSE_LEVEL_PRINT_NOTHING = 0
 # SIGUSR1 debug option
 ENABLE_DEBUG_PROCESS = False
-VERBOSE_LEVEL = 0
+VERBOSE_LEVEL = VERBOSE_LEVEL_PRINT_ERROR_MESSAGES
 
 # performance process ######
 PRINT_PERFORMANCE_TIMEOUT = 5.0

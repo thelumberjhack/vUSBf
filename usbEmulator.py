@@ -85,8 +85,6 @@ class usb_emulator:
     def execute(self):
         connection_to_victim = self.__connect_to_server()
         if connection_to_victim is None:
-            return False
-        if connection_to_victim is None:
             print "Unable to connect to victim..."
             return False
         r_value = self.__connection_loop(connection_to_victim)
@@ -140,18 +138,21 @@ class usb_emulator:
             self.__print_data(self.__send_data(self.__get_if_info_packet(), connection_to_victim), False)
             self.__print_data(self.__send_data(self.__get_ep_info_packet(), connection_to_victim), False)
             self.__print_data(self.__send_data(self.__get_connect_packet(), connection_to_victim), False)
-        except:
+        except Exception as e:
+            print e
             return False
 
         for _ in range(config.MAX_PACKETS):
             try:
-                new_packet = usbredirheader(self.__recv_data_dont_print(12, connection_to_victim))
+                received_data = self.__recv_data(12, connection_to_victim)
+                new_packet = usbredirheader(received_data)
                 if new_packet.Htype == -1:
                     return True
                 raw_data = self.__recv_data_dont_print(new_packet.HLength, connection_to_victim)
                 raw_data = str(new_packet) + raw_data
                 new_packet = usbredir_parser(raw_data).getScapyPacket()
-            except:
+            except Exception as e:
+                print e
                 return True
 
             # hello packet
@@ -238,7 +239,8 @@ class usb_emulator:
         try:
             data = connection_to_victim.recv(length)
             return data
-        except:
+        except Exception as e:
+            print e.message  + " during receiving data"
             return ""
 
     def __recv_data_dont_print(self, length, connection_to_victim):
@@ -263,13 +265,14 @@ class usb_emulator:
         while True:
             try:
                 if self.unix_socket == "":
+                    print "Connecting to victim on TCP socket "  + str(self.ip)  + ":" + str(self.port)
                     connection_to_victim = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    connection_to_victim.settimeout(config.UNIX_SOCKET_TIMEOUT)
+                    connection_to_victim.settimeout(config.TCP_SOCKET_TIMEOUT)
                     connection_to_victim.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                     connection_to_victim.connect((self.ip, self.port))
                 else:
                     connection_to_victim = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                    connection_to_victim.settimeout(config.TCP_SOCKET_TIMEOUT)
+                    connection_to_victim.settimeout(config.UNIX_SOCKET_TIMEOUT)
                     connection_to_victim.connect(self.unix_socket)
                 break
             except:
