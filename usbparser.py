@@ -81,13 +81,11 @@ class usbredir_parser(parser):
             return header_layer
 
         specific_layer = None
-        for layer in redir_specific_type:
-            if Htype == layer[0]:
-                try:
-                    specific_layer = layer[1](raw[12:HLength+12])
-                except:
-                    pass
-                break
+        if Htype in redir_specific_type:
+          try:
+            redir_specific_type[Htype](raw[12:HLength+12])
+          except:
+            pass
 
         # UNKOWN SPECIFIC REDIR HEADER
         if specific_layer == None:
@@ -97,13 +95,12 @@ class usbredir_parser(parser):
         # CONTROL DATA REDIR HEADER
         elif Htype == 100:
             if specific_layer.haslayer(Raw):
-
                 # IF REPORT DESC EXIT
                 tmp_value = ""
                 tmp_value = specific_layer.value
                 tmp_value = tmp_value - 8704
                 if tmp_value < 256 and tmp_value >= 0:
-                    hid_report = usb_hid_report_descriptor(str(specific_layer.payload))
+                    hid_report = USBHIDReportDescriptor(str(specific_layer.payload))
                     specific_layer.payload = None
                     return  header_layer / specific_layer / hid_report
                 control_layer = control_packet_parser(specific_layer.load, specific_layer.request).getScapyPacket()
@@ -165,31 +162,31 @@ class control_packet_parser(parser):
             # IF LEN == 5 AND TYPE == 1 -> REPORT DESCRIPTOR
             if generic_descriptor_header.bLength < 18:
                 return Raw(data)
-            newlayer = usb_device_descriptor(data[0:generic_descriptor_header.bLength])
+            newlayer = USBDeviceDescriptor(data[0:generic_descriptor_header.bLength])
 
         # CONFIGURATION DESCRIPTOR
         elif generic_descriptor_header.bDescriptorType == 0x2 and len(data) >= 9:
-            newlayer = usb_configuration_descriptor(data[0:generic_descriptor_header.bLength])
+            newlayer = USBConfigurationDescriptor(data[0:generic_descriptor_header.bLength])
 
         # INTERFACE DESCRIPTOR
         elif generic_descriptor_header.bDescriptorType == 0x04 and len(data) >= 9:
-            newlayer = usb_interface_descriptor(data[0:generic_descriptor_header.bLength])
+            newlayer = USBInterfaceDescriptor(data[0:generic_descriptor_header.bLength])
 
          # STRING LANGID DESCRIPTOR
         elif generic_descriptor_header.bDescriptorType == 0x03 and index == 0 and len(data) >= 4:
-            newlayer = usb_string_descriptor_langid(data[:generic_descriptor_header.bLength])
+            newlayer = USBStringDescriptorLanguage(data[:generic_descriptor_header.bLength])
 
         # STRING DESCRIPTOR
         elif generic_descriptor_header.bDescriptorType == 0x03 and index != 0 and len(data) >= 4:
-            newlayer = usb_string_descriptor(data[:generic_descriptor_header.bLength])
+            newlayer = USBStringDescriptor(data[:generic_descriptor_header.bLength])
 
         # HID DESCRIPTOR
         elif generic_descriptor_header.bDescriptorType == 0x09 and index != 0 and len(data) >= 4:
-            newlayer = usb_hid_descriptor(data[:generic_descriptor_header.bLength])
+            newlayer = USBHIDDescriptor(data[:generic_descriptor_header.bLength])
 
         # ENDPOINT DESCRIPTOR
         elif generic_descriptor_header.bDescriptorType == 0x05 and len(data) >= 7:
-            newlayer = usb_endpoint_descriptor(data[:generic_descriptor_header.bLength])
+            newlayer = USBEndpointDescriptor(data[:generic_descriptor_header.bLength])
 
         # UNKNOWN DATA
         else:
