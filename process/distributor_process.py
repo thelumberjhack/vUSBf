@@ -7,7 +7,6 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from fileParser import *
 from clustering.network_task_distributor import process
 from multiprocessing import Process, Value, Queue
 from threading import Thread

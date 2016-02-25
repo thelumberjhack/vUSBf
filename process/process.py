@@ -7,8 +7,8 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from fileParser import *
 import signal
+import sys
 import os
 
 sys.path.append(os.path.abspath('../'))

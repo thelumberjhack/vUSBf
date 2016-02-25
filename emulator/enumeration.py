@@ -13,7 +13,6 @@ from emulator import emulator
 
 sys.path.append(os.path.abspath('../'))
 from usbparser import *
-from fileParser import *
 from descFuzzer import *
 
 

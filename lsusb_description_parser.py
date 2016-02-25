@@ -5,10 +5,12 @@
 
     See the file LICENSE for copying permission.
 """
-
 from usbscapy import *
 
-class usbdescFileParser:
+class LinuxLSUSBDescriptionParser:
+    """
+            This class is meant to parse the output of lsusb and turn it into scapy packets that can be replicated
+    """
     descriptor_types = ["Device Descriptor:",
                         "Configuration Descriptor:",
                         "Interface Descriptor:",
@@ -19,7 +21,6 @@ class usbdescFileParser:
 
     data = ""
     speed = 2
-
 
     def __init__(self, filePath):
         try:
@@ -68,7 +69,6 @@ class usbdescFileParser:
 
         # build payload
         for line in data:
-
             newLayer = self.__parseDescriptor(line)
 
             # add device descriptor to list
@@ -86,8 +86,6 @@ class usbdescFileParser:
                 if devDesc[1][len(devDesc[1]) - 1] != None:
                     devDesc[1][len(devDesc[1]) - 1][1][len(devDesc[1][len(devDesc[1]) - 1][1]) - 1][1].append(newLayer)
 
-
-
             # scapyPacket
             if newLayer != None:
                 if scapyPacket == None:
@@ -103,7 +101,6 @@ class usbdescFileParser:
         connectPacket.vendor_id = scapyPacket.isVendor
         connectPacket.product_id = scapyPacket.idProduct
         connectPacket.device_version_bcd = scapyPacket.bcdDevice
-
 
         # interface info
         tmp = scapyPacket
