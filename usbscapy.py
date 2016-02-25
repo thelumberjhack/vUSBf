@@ -10,6 +10,8 @@ __author__ = 'Sergej Schumilo'
 import struct
 from scapy.all import *
 from scapy.fields import *
+from scapy.packet import *
+
 
 #####################################
 ####### SCAPY EXTENSION STUFF #######
@@ -90,7 +92,6 @@ class usbredirheader(Packet):
                    LEIntField("HLength", 0),
                    LEIntField("Hid", -1)]
 
-
 # Redir Packet No. 0 (redir hello)
 class hello_redir_header(Packet):
     name = "Hello_Packet"
@@ -123,7 +124,7 @@ class connect_redir_header(Packet):
 
 
 # Redir Packet No. 4 (interface info)   [SIZE 132 BYTES]
-class if_info_redir_header(Packet):
+class interface_info_redir_header(Packet):
     name = "Interface Info Packet"
     fields_desc = [LEIntField("interface_count", None),
                    FieldListField("interface", None, ByteField("Value", 0), length_from=lambda p: 32),
@@ -186,12 +187,16 @@ class data_interrupt_redir_header(Packet):
 redir_specific_type = {
                        0: hello_redir_header,
                        1: connect_redir_header,
+                       4: interface_info_redir_header,
+                       5:  ep_info_redir_header,
                        100: data_control_redir_header,
                        101: data_bulk_redir_header,
                        102: data_iso_redir_header,
                        103: data_interrupt_redir_header
                       }
 
+
+#Layer binding doesn't appear to be working properly
 for redir_type_id, redir_control_pkg in redir_specific_type.iteritems():
   bind_layers( usbredirheader, redir_control_pkg, Htype = redir_type_id)
 

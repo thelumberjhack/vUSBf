@@ -61,7 +61,7 @@ class LinuxLSUSBDescriptionParser:
         data = data.split(";")
 
         connectPacket = connect_redir_header()
-        interface_info = if_info_redir_header()
+        interface_info = interface_info_redir_header()
         endpoint_info = ep_info_redir_header()
         scapyPacket = None
         devDesc = None

@@ -7,7 +7,9 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from usbparser import *
+from usbscapy import *
+import scapy
+from scapy.packet import bind_layers, split_layers, Raw
 from lsusb_description_parser import LinuxLSUSBDescriptionParser
 from emulator.enumeration_abortion import abortion_enumeration
 from emulator.enumeration import enumeration
@@ -133,7 +135,9 @@ class usb_emulator:
 
         connection_to_victim.settimeout(config.CONNECTION_TO_VICTIM_TIMEOUT)
         try:
-            self.__print_data(self.__recv_data(80, connection_to_victim), True) #Receive the hello packet from the emulator
+            #Receive the hello packet from the emulator
+            hello_packet = self.__recv_data(80, connection_to_victim)
+            self.__print_data(hello_packet, True)
             self.__print_data(self.__send_data(self.__get_hello_packet(), connection_to_victim), False)
             self.__print_data(self.__send_data(self.__get_if_info_packet(), connection_to_victim), False)
             self.__print_data(self.__send_data(self.__get_ep_info_packet(), connection_to_victim), False)
