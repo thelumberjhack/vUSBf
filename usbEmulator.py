@@ -56,7 +56,14 @@ class usb_emulator:
     def setup_payload(self, payload):
 
         data = usbdescFileParser(config.DEV_DESC_FOLDER + payload.get_option("descriptor")).parse()
-        print "Payload: " + str(data[0])
+
+        for e in data:
+          if e is None: continue
+          for j in e:
+            if type(j) is list:
+              print j
+            print j.__class__
+
         self.payload = data[0]
         self.if_info_packet = data[3]
         self.ep_info_packet = data[4]
@@ -176,7 +183,7 @@ class usb_emulator:
                 self.__print_data(self.__send_data(str(new_packet), connection_to_victim), False)
                 return True
 
-            # cancle_data_packet packet
+            # cancel_data_packet packet
             elif new_packet.Htype == 21:
                 return True
 

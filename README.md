@@ -20,8 +20,7 @@ GENERAL
 A USB-fuzzer which takes advantage of massive usage of virtual machines and also offers high reproducibility.
 This framework was initially released at Black Hat Europe 2014.
 
-https://www.blackhat.com/docs/eu-14/materials/eu-14-Schumilo-Dont-Trust-Your-USB
--How-To-Find-Bugs-In-USB-Device-Drivers-wp.pdf
+https://www.blackhat.com/docs/eu-14/materials/eu-14-Schumilo-Dont-Trust-Your-USB-How-To-Find-Bugs-In-USB-Device-Drivers-wp.pdf
 
 This software is under heavy development. Get a copy of the actual version at github:
 
@@ -34,7 +33,7 @@ This framework provides:
 - USB-fuzzing in practical time frames
 - multiprocessing and clustering
 - export sequences of payloads and replay them for debugging or investigation
-- XML-based dynamic testcase generating 
+- XML-based dynamic testcase generating
 - expandable by writing new testcases, USB-emulators or monitoring-modules
 
 vUSBf was written in python2 and requires the Scapy-framework.
@@ -96,7 +95,7 @@ Moreover the lack of USB-emulators is another point we are working on.
 
 Furthermore some inline comments have been written in my native language (german). They will be translated later ;-) and the code will be more documented!
 
-Comrade-in-arms are welcome :-)! 
+Comrade-in-arms are welcome :-)!
 There is a lot of work to do!
 
 

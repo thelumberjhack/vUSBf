@@ -192,7 +192,7 @@ class usb_generic_descriptor_header(Packet):
 
 
 # USB Device Descriptor Packet (DescriptorType 0x01)
-class usb_device_descriptor(Packet):
+class USBDeviceDescriptor(Packet):
     name = "USB_Device_Descriptor"
     fields_desc = [ByteField("bLength", 18),
                    XByteField("bDescriptorType", 0x01),
@@ -209,9 +209,8 @@ class usb_device_descriptor(Packet):
                    ByteField("iSerialNumber", 0),
                    ByteField("bNumConfigurations", 1)]
 
-
 # USB Configuration Descriptor
-class usb_configuration_descriptor(Packet):
+class USBConfigurationDescriptor(Packet):
     name = "USB_Configuration_Descriptor"
     fields_desc = [ByteField("bLength", 9),  # Size of Descriptor in Bytes
                    XByteField("bDescriptorType", 0x02),  # Configuration Descriptor (0x02)
@@ -232,9 +231,8 @@ class usb_configuration_descriptor(Packet):
                    ByteField("bMaxPower", None)  # Maximum Power consumption in 2mA units
     ]
 
-
 # USB Interface_Descriptor
-class usb_interface_descriptor(Packet):
+class USBInterface(Packet):
     name = "USB_Interface_Descriptor"
     fields_desc = [ByteField("bLength", 9),  # Size of Descriptor in Bytes (9 Bytes)
                    XByteField("bDescriptorType", 0x04),  # Configuration Descriptor (0x04)
@@ -353,7 +351,7 @@ class massstorage_cbw(Packet):
 
 # Command Status Wrapper (CSW)
 class massstorage_csw(Packet):
-		name = "Massstorage_CSW"
+		name = "Masstorage_CSW"
 		fields_desc = [	XLEIntField("dCSWSignature", 0),
 				IntField("dCSWTag", None),
 				XLEIntField("dCSWDataResidue", None),
