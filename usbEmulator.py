@@ -133,7 +133,7 @@ class usb_emulator:
 
         connection_to_victim.settimeout(config.CONNECTION_TO_VICTIM_TIMEOUT)
         try:
-            self.__print_data(self.__recv_data(80, connection_to_victim), True)
+            self.__print_data(self.__recv_data(80, connection_to_victim), True) #Receive the hello packet from the emulator
             self.__print_data(self.__send_data(self.__get_hello_packet(), connection_to_victim), False)
             self.__print_data(self.__send_data(self.__get_if_info_packet(), connection_to_victim), False)
             self.__print_data(self.__send_data(self.__get_ep_info_packet(), connection_to_victim), False)
@@ -238,6 +238,8 @@ class usb_emulator:
     def __recv_data(self, length, connection_to_victim):
         try:
             data = connection_to_victim.recv(length)
+            if(len(data) != length):
+              print "We received an amount of data we didn't expect"
             return data
         except Exception as e:
             print e.message  + " during receiving data"
@@ -249,7 +251,9 @@ class usb_emulator:
 
     def __send_data(self, data, connection_to_victim):
         try:
-            connection_to_victim.send(data)
+            bytes_sent = connection_to_victim.send(data)
+            if(bytes_sent != len(data)):
+              print "We wanted to send %d bytes, but we sent %d bytes" % (len(data), bytes_sent)
             return data
         except:
             return ""
