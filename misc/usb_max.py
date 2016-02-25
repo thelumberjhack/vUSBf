@@ -14,7 +14,7 @@ import re, struct
 from scapy.packet import *
 from scapy.fields import *
 
-# Get Descriptor codes  
+# Get Descriptor codes
 GD_DEVICE           =0x01   # Get device descriptor: Device
 GD_CONFIGURATION    =0x02   # Get device descriptor: Configuration
 GD_STRING           =0x03   # Get device descriptor: String
@@ -70,90 +70,7 @@ _config_bmAttributes_names = [
 
 ### Layers ###
 
-class USBSetup(Packet):
-    '''
-    Represents the Setup Packets that a device receives from the host.
-    Reference: http://www.beyondlogic.org/usbnutshell/usb6.shtml#SetupPacket
-    '''
-    name = "USB Setup"
-    fields_desc = [
-        #bmRequestType can be broken down further:
-        # D7 Data Phase Transfer Direction (0 = Host to Device, 1 = Device to Host)
-        # D6..5 Type (0 = Standard, 1 = Class, 2 = Vendor, 3 = Reserved)
-        # D4..0 Recipient (0 = Device, 1 = Interface, 2 = Endpoint, 3 = Other, 4..31 = Reserved)
-        XByteField("bmRequestType", 0),
-        XByteEnumField("bRequest", 0x00, _setup_bRequest_types),
-        # The wValueH could be interpreted via _gd_descriptor_codes{}
-        XLEShortField("wValue", 0),
-        XLEShortField("wIndex", 0),
-        XLEShortField("wLength", 0),
-    ]
 
-    def mysummary(self):
-        if self.bmRequestType == 0x00 and self.bRequest == 0x05: #SET_ADDRESS
-            return self.sprintf("Setup %USBSetup.bRequest%: device address=" + str(self.wValue))
-        elif self.bmRequestType == 0x00 and self.bRequest == 0x09:
-            return self.sprintf("Setup %USBSetup.bRequest%: desired bConfigurationValue=%USBSetup.wValue%")
-        return self.sprintf("Setup bmRequestType=%USBSetup.bmRequestType%, bRequest=%USBSetup.bRequest%, wValue=%USBSetup.wValue%, wIndex=%USBSetup.wIndex%, wLength=%USBSetup.wLength%")
-
-    def getRequestLength(self):
-        '''Return the 16-bit length defined in the setup packet.'''
-        return (self.wLength&0xFF) + 256*(self.wLength >> 8)
-    
-    @property
-    def wValueH(self):
-        return (self.wValue >> 8)
-    @property
-    def wValueL(self):
-        return (self.wValue & 0xFF)
-    @property
-    def wIndexL(self):
-        return (self.wIndex & 0xFF)
-
-class USBDeviceDescriptor(Packet):
-    '''During the setup process provides the descriptor of the device being enumerated.'''
-    name = "USB Device Descriptor Response"
-    fields_desc = [
-        ByteField("bLength", 18),
-        ByteField("bDescriptorType", 1), # 1=Device
-        XLEShortField("bcdUSB", 0x0100), # USB spec rev (BCD)
-        XByteField("bDeviceClass", 0),
-        XByteField("bDeviceSubClass", 0),
-        XByteField("bDeviceProtocol", 0),
-        ByteField("bMaxPacketSize0", 0x40), #EP0 is 64 bytes
-        XLEShortField("idVendor", 0x0B6A), # idVendor(L/H)--Maxim is 0B6A
-        XLEShortField("idProduct", 0x5346), # idProduct(L/H)--0x46,0x53
-        #bcdDevice has the same format than the bcdUSB and is used to provide 
-        # a device version number. This value is assigned by the developer.
-        XLEShortField("bcdDevice", 0x1234), # bcdDevice--0x34,0x12
-        #Three string descriptors exist to provide details of the manufacturer, 
-        # product and serial number. There is no requirement to have string 
-        # descriptors. If none is present, a index of zero should be used.
-        ByteField("iManufacturer", 1),
-        ByteField("iProduct", 2),
-        ByteField("iSerialNumber", 3),
-        #bNumConfigurations defines num. of configs the device supports at its current speed.
-        ByteField("bNumConfigurations", 1),
-    ]
-
-    def answers(self, other):
-        '''
-        If the USBSetup packet has a standard request to send a descriptor 
-        and it is a device descriptor request.
-        '''
-        if isinstance(other, USBSetup):
-            #Standard Request and Send Descriptor and Device Descriptor Request
-            if other.bmRequestType & 0x60 == 0x00 and  \
-               other.bRequest == SR_GET_DESCRIPTOR and \
-               other.wValueH == GD_DEVICE:
-                return True
-        return False
-
-    def getBuiltArray(self):
-        return map(lambda x: ord(x), str(self))
-
-    def getDescLen(self):
-        return self.bLength
 
 class USBDescriptorHID(Packet):
     '''One of the descriptors that can be nested into a full Configuration Descriptor.'''
@@ -168,25 +85,6 @@ class USBDescriptorHID(Packet):
         LEShortField("wDescriptorLength", 43), #report descriptor size is 43 bytes
     ]
 
-class USBDescriptorEndpoint(Packet):
-    '''One of the descriptors that can be nested into a full Configuration Descriptor.'''
-    name = "USB Endpoint Descriptor"
-    fields_desc = [
-        ByteField("bLength", 0x07),
-        XByteField("bDescriptorType", 0x05),# type = Endpoint
-        #Endpoint Address
-        #Bits 0..3b Endpoint Number.
-        #Bits 4..6b Reserved. Set to Zero
-        #Bits 7 Direction 0 = Out, 1 = In (Ignored for Control Endpoints)
-        XByteField("bEndpointAddress", 0x83), # bEndpointAddress (default EP3-IN)
-        #TODO split bmAttributes by flags, but it changes based on endpoint type
-        ByteField("bmAttributes", 3),         # 3=interrupt
-        #bmAttributes: Bits 0..1 Transfer Type
-        #BitEnumField("bmAttributes_transfertype", 0b11, 2, \
-        #    {0x0:"Control", 0x1:"Isochronous", 0x2:"Bulk", 0x3:"Interrupt"}),
-        XLEShortField("wMaxPacketSize", 64), # wMaxPacketSize (64d)
-        ByteField("unknown", 10), #TODO find name and label correctly
-    ]
 
 class USBDescriptorInterface(Packet):
     '''One of the descriptors that can be nested into a full Configuration Descriptor.'''
@@ -216,57 +114,6 @@ class USBDescriptorInterface(Packet):
             count_from=lambda pkt: pkt.bNumEndpoints),
     ]
 
-class USBConfigurationDescriptor(Packet):
-    '''
-    During the setup process provides the config descriptor of the device 
-    being enumerated. When the configuration descriptor is read, it returns the 
-    entire configuration hierarchy which includes all related interface and 
-    endpoint descriptors.
-    Reference: http://www.beyondlogic.org/usbnutshell/usb5.shtml
-    '''
-    name = "USB Configuration Descriptor Response"
-    fields_desc = [ #TODO each section of this should be broken out into sub-packets
-        ByteField("bLength", 0x09),
-        ByteField("bDescriptorType", 0x02), # 2=Config
-        #The wTotalLength field reflects the number of bytes in the hierarchy.
-        XLEShortField("wTotalLength", 0x0022),
-        #bNumInterfaces specifies the number of interfaces present for this configuration.
-        ByteField("bNumInterfaces", 1),
-        #bConfigurationValue is used by the SetConfiguration request to select this configuration.
-        XByteField("bConfigurationValue", 0x01),
-        #iConfiguration is a index to a string descriptor describing the configuration in human readable form.
-        XByteField("iConfiguration", 0x00),
-        #Default 0xE0 = b7=1, b6=self-powered, b5=RWU (remote wake-up) supported
-        FlagsField("bmAttributes", 0b11100000, 8, _config_bmAttributes_names),
-        #bMaxPower defines the maximum power the device will drain from the bus.
-        # It is in 2mA units, so a max of ~500mA can be specified (max in spec).
-        ByteField("bMaxPower", 0x01), # MaxPower default=2mA
-        # TODO this will currently only instantiate one Interface by default, but we'd
-        #      like this to instantiate the amount based on the setting of bNumEndpoints,
-        #      and furthermore, the Interface IDs should increment if possible.
-        PacketListField("iface_list", USBDescriptorInterface(), USBDescriptorInterface, \
-            count_from=lambda pkt: pkt.bNumInterfaces),
-    ]
-
-    def answers(self, other):
-        '''
-        If the USBSetup packet has a standard request to send a descriptor 
-        and it is a device descriptor request.
-        '''
-        if isinstance(other, USBSetup):
-            #Standard Request and Send Descriptor and Configuration Request
-            if other.bmRequestType & 0x60 == 0x00 and  \
-               other.bRequest == SR_GET_DESCRIPTOR and \
-               other.wValueH == GD_CONFIGURATION:
-                return True
-        return False
-
-    def getBuiltArray(self):
-        return map(lambda x: ord(x), str(self))
-
-    def getDescLen(self):
-        return self.wTotalLength
-
 class USBStringDescriptor(Packet):
     '''
     During the setup process provides the string descriptors requested for
@@ -282,7 +129,7 @@ class USBStringDescriptor(Packet):
 
     def answers(self, other):
         '''
-        If the USBSetup packet has a standard request to send a descriptor 
+        If the USBSetup packet has a standard request to send a descriptor
         and it is a string descriptor request.
         '''
         if isinstance(other, USBSetup):
@@ -384,7 +231,7 @@ class TestConfigurationDescriptor(unittest.TestCase):
     # Endpoint Descriptor
     0x07,           # bLength
     0x05,           # bDescriptorType (Endpoint)
-    0x83,           # bEndpointAddress (EP3-IN)     
+    0x83,           # bEndpointAddress (EP3-IN)
     0x03,           # bmAttributes  (interrupt)
     64,0,                   # wMaxPacketSize (64)
     10];

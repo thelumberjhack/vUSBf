@@ -72,16 +72,16 @@ class usbdescFileParser:
             newLayer = self.__parseDescriptor(line)
 
             # add device descriptor to list
-            if type(newLayer) == usb_device_descriptor:
+            if type(newLayer) == USBDeviceDescriptor:
                 devDesc = [newLayer, []]
             # add donfiguration descriptor to list
-            elif type(newLayer) == usb_configuration_descriptor and devDesc != None:
+            elif type(newLayer) == USBConfigurationDescriptor and devDesc != None:
                 devDesc[1].append([newLayer, []])
             # add interface descriptor to list
-            elif type(newLayer) == usb_interface_descriptor and devDesc[1] != None:
+            elif type(newLayer) == USBInterfaceDescriptor and devDesc[1] != None:
                 devDesc[1][len(devDesc[1]) - 1][1].append([newLayer, []])
             # add endpoint / HID descriptor to list
-            elif (type(newLayer) == usb_endpoint_descriptor or type(newLayer) == usb_hid_descriptor) and devDesc[
+            elif (type(newLayer) == USBEndpointDescriptor or type(newLayer) == USBHIDDescriptor ) and devDesc[
                 1] != None:
                 if devDesc[1][len(devDesc[1]) - 1] != None:
                     devDesc[1][len(devDesc[1]) - 1][1][len(devDesc[1][len(devDesc[1]) - 1][1]) - 1][1].append(newLayer)
@@ -113,13 +113,13 @@ class usbdescFileParser:
         interface_protocol = []
 
         while True:
-            if tmp.haslayer(usb_interface_descriptor):
-                if tmp[usb_interface_descriptor].bInterfaceNumber != None:
-                    interface.append(tmp[usb_interface_descriptor].bInterfaceNumber)
-                    interface_class.append(tmp[usb_interface_descriptor].bInterfaceClass)
-                    interface_subclass.append(tmp[usb_interface_descriptor].bInterfaceSubClass)
-                    interface_protocol.append(tmp[usb_interface_descriptor].bInterfaceProtocol)
-                tmp = tmp[usb_interface_descriptor].payload
+            if tmp.haslayer(USBInterfaceDescriptor):
+                if tmp[USBInterfaceDescriptor].bInterfaceNumber != None:
+                    interface.append(tmp[USBInterfaceDescriptor].bInterfaceNumber)
+                    interface_class.append(tmp[USBInterfaceDescriptor].bInterfaceClass)
+                    interface_subclass.append(tmp[USBInterfaceDescriptor].bInterfaceSubClass)
+                    interface_protocol.append(tmp[USBInterfaceDescriptor].bInterfaceProtocol)
+                tmp = tmp[USBInterfaceDescriptor].payload
             else:
                 break
 
@@ -161,9 +161,9 @@ class usbdescFileParser:
         ep_info_type[16] = 0
 
         while True:
-            if type(datacopy) == usb_interface_descriptor:
+            if type(datacopy) == USBInterfaceDescriptor:
                 interface_num = datacopy.bInterfaceNumber
-            elif type(datacopy) == usb_endpoint_descriptor:
+            elif type(datacopy) == USBEndpointDescriptor:
                 if not (datacopy.bmAttribut == None or datacopy.bInterval == None or datacopy.wMaxPacketSize == None):
                     # CALC POSITION
                     pos = 0
@@ -255,19 +255,19 @@ class usbdescFileParser:
             return None
         else:
             if desctype == descriptor_types[0]:
-                desc = usb_device_descriptor()
+                desc = USBDeviceDescriptor()
                 return self.__parser(desc, data)
             elif desctype == descriptor_types[1]:
-                desc = usb_configuration_descriptor()
+                desc = USBConfigurationDescriptor()
                 return self.__parser(desc, data)
             elif desctype == descriptor_types[2]:
-                desc = usb_interface_descriptor()
+                desc = USBInterfaceDescriptor()
                 return self.__parser(desc, data)
             elif desctype == descriptor_types[3]:
-                desc = usb_endpoint_descriptor()
+                desc = USBEndpointDescriptor()
                 return self.__parser(desc, data)
             elif desctype == descriptor_types[4]:
-                desc = usb_hid_descriptor()
+                desc = USBHIDDescriptor()
                 self.__parser(desc, data)
                 desc.bDescriptorType = 33
                 desc.bDescriptorType2 = 34
