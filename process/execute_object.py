@@ -7,7 +7,7 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from usbEmulator import usb_emulator
+from usb_emulator import USBEmulator
 from multi_process import multi_processing
 from test_generation.TestcaseLoader import testcase_loader
 import config
@@ -35,6 +35,6 @@ def execute_object_process(object_file, host="", port=0, target=None):
     else:
         for e in payloads.payloads:
             print e
-            emu = usb_emulator([host, port], 0)
+            emu = USBEmulator([host, port], 0)
             emu.setup_payload(e)
             emu.execute()

@@ -7,7 +7,7 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from usbEmulator import usb_emulator
+from usb_emulator import USBEmulator
 from test_generation.XMLParser import xml_parser
 import sys
 import os
@@ -36,7 +36,7 @@ def only_payload_process(host, port, exec_name, exec_list, exec_path, testcase_p
 
     print "[*] Number of tests: " + str(xml_tree.get_number_of_elements())
     xml_tree.print_tree()
-    emu = usb_emulator([host, port], 0)
+    emu = USBEmulator([host, port], 0)
     payloads = xml_tree.get_data_chunk(config.NUMBER_OF_JOBS_PER_PROCESS_NM)
     random.shuffle(payloads)
     while payloads is not None:

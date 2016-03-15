@@ -7,7 +7,7 @@
 """
 
 import shutil
-from usbEmulator import *
+from usb_emulator import *
 from monitor.linux_monitor import *
 import config
 
@@ -156,9 +156,9 @@ class qemu:
             raise Exception("address error...")
 
         if type(address) == str:
-            self.emu = usb_emulator(address, 1)
+            self.emu = USBEmulator(address, 1)
         else:
-            self.emu = usb_emulator(address, 0)
+            self.emu = USBEmulator(address, 0)
 
     def __del__(self):
         if self.alive():

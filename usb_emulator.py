@@ -7,19 +7,16 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from usbscapy import *
-from usbparser import *
-import scapy
-from scapy.packet import bind_layers, split_layers, Raw
-from lsusb_description_parser import LinuxLSUSBDescriptionParser
-from emulator.enumeration_abortion import abortion_enumeration
+import config
 from emulator.enumeration import enumeration
+from emulator.enumeration_abortion import abortion_enumeration
 from emulator.hid import hid
 from fuzzer import fuzzer
-import config
+from lsusb_description_parser import LinuxLSUSBDescriptionParser
+from usbparser import *
 
 
-class usb_emulator:
+class USBEmulator(object):
     port = 0
     ip = ""
     unix_socket = ""
@@ -118,7 +115,8 @@ class usb_emulator:
         pkt = pkt / Raw(str(self.ep_info_packet))
         return str(pkt)
 
-    def __get_reset_packet(self):
+    @staticmethod
+    def __get_reset_packet():
         pkt = usbredirheader()
         pkt.Htype = 3
         pkt.HLength = 0
@@ -129,7 +127,7 @@ class usb_emulator:
 
         connection_to_victim.settimeout(config.CONNECTION_TO_VICTIM_TIMEOUT)
         try:
-            #Receive the hello packet from the emulator
+            # Receive the hello packet from the emulator
             hello_packet = self.__recv_data(80, connection_to_victim)
             self.__print_data(hello_packet, True)
             self.__print_data(self.__send_data(self.__get_hello_packet(), connection_to_victim), False)
@@ -167,7 +165,6 @@ class usb_emulator:
                 self.__print_data(str(new_packet), True)
                 self.__print_data(self.__send_data(self.__get_reset_packet(), connection_to_victim), False)
 
-
             # set_configuration packet
             elif new_packet.Htype == 6:
                 self.__print_data(str(new_packet), True)
@@ -175,7 +172,7 @@ class usb_emulator:
                 new_packet.HLength = new_packet.HLength + 1
                 new_packet.payload = Raw('\x00' + str(new_packet.payload))
                 self.__print_data(self.__send_data(str(new_packet), connection_to_victim), False)
-                #connection_to_victim.settimeout(0.5)
+                # connection_to_victim.settimeout(0.5)
 
             # start_interrupt_receiving packet
             elif new_packet.Htype == 15:
@@ -218,7 +215,8 @@ class usb_emulator:
 
         return True
 
-    def __print_data(self, data, recv):
+    @staticmethod
+    def __print_data(data, recv):
         if config.VERBOSE_LEVEL >= config.VERBOSE_LEVEL_PRINT_RECV_DATA:
             print config.DELIMITER
             if recv:
@@ -236,34 +234,36 @@ class usb_emulator:
                 Raw(data).show()
             print ""
 
-    # if verbose level 3 or higher print packet content
-    def __recv_data(self, length, connection_to_victim):
+    @staticmethod
+    def __recv_data(length, connection_to_victim):
         try:
             data = connection_to_victim.recv(length)
-            if(len(data) != length):
-              print "We received an amount of data we didn't expect"
+            if len(data) != length:
+                print "We received an amount of data we didn't expect"
             return data
         except Exception as e:
-            print e.message  + " during receiving data"
+            print e.message + " during receiving data"
             return ""
 
-    def __recv_data_dont_print(self, length, connection_to_victim):
+    @staticmethod
+    def __recv_data_dont_print(length, connection_to_victim):
         return connection_to_victim.recv(length)
 
-
-    def __send_data(self, data, connection_to_victim):
+    @staticmethod
+    def __send_data(data, connection_to_victim):
         try:
             bytes_sent = connection_to_victim.send(data)
-            if(bytes_sent != len(data)):
-              print "We wanted to send %d bytes, but we sent %d bytes" % (len(data), bytes_sent)
+            if bytes_sent != len(data):
+                print("We wanted to send %d bytes, but we sent %d bytes" % (len(data), bytes_sent))
             return data
-        except:
+        except socket.error as e:
+            print("ERROR:\t{}".format(e.message))
             return ""
 
-    def __print_error(self, msg):
+    @staticmethod
+    def __print_error(msg):
         if config.VERBOSE_LEVEL >= config.VERBOSE_LEVEL_PRINT_ERROR_MESSAGES:
-            print "ERROR:\t" + msg
-
+            print("ERROR:\t{}".format(msg))
 
     def __connect_to_server(self):
         num_of_tries = 0
@@ -271,17 +271,19 @@ class usb_emulator:
         while True:
             try:
                 if self.unix_socket == "":
-                    print "Connecting to victim on TCP socket "  + str(self.ip)  + ":" + str(self.port)
+                    print("Connecting to victim using TCP socket {}: {}".format(self.ip, self.port))
                     connection_to_victim = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     connection_to_victim.settimeout(config.TCP_SOCKET_TIMEOUT)
                     connection_to_victim.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                     connection_to_victim.connect((self.ip, self.port))
                 else:
+                    print("Connecting to victim using UNIX socket {}".format(self.unix_socket))
                     connection_to_victim = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
                     connection_to_victim.settimeout(config.UNIX_SOCKET_TIMEOUT)
                     connection_to_victim.connect(self.unix_socket)
                 break
-            except:
+            except socket.error as e:
+                print("ERROR:\t{}".format(e))
                 num_of_tries += 1
                 if config.NUMBER_OF_RECONNECTS == num_of_tries:
                     time.sleep(config.TIME_BETWEEN_RECONNECTS)
