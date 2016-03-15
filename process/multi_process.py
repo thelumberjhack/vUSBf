@@ -8,13 +8,12 @@
 __author__ = 'Sergej Schumilo'
 
 from multiprocessing import Process, Value, Queue, Semaphore
-from qemu import qemu
-from process import process
+
 from print_performance_process import *
+from process import process
+from qemu import qemu
 from test_generation.XMLParser import xml_parser
-import signal
-import time
-import os
+
 sys.path.append(os.path.abspath('../'))
 import config
 
@@ -23,7 +22,7 @@ printPerf_process = None
 network_requester_process = None
 
 
-def signal_handler(a,b):
+def signal_handler(a, b):
     kill_all()
 
 
@@ -95,12 +94,14 @@ def multi_processing(process_number, target_object, exec_name, exec_list, exec_p
         qemu_list.append(qemu_object)
         if process_number == 1 and file_name is not None:
             process_list.append(Process(target=process, args=(
-                "t" + str(i), qemu_object, sm_num_of_tasks, i, info_queue, queue_list[i], reload_test, sem, process_lock), kwargs={"file_postfix_name": file_name}))
+                "t" + str(i), qemu_object, sm_num_of_tasks, i, info_queue, queue_list[i], reload_test, sem,
+                process_lock), kwargs={"file_postfix_name": file_name}))
         else:
             process_list.append(Process(target=process, args=(
-                "t" + str(i), qemu_object, sm_num_of_tasks, i, info_queue, queue_list[i], reload_test, sem, process_lock)))
+                "t" + str(i), qemu_object, sm_num_of_tasks, i, info_queue, queue_list[i], reload_test, sem,
+                process_lock)))
 
-    printPerf_process = Process(target=printPerf, args=(max_tasks, sm_num_of_tasks))
+    printPerf_process = Process(target=print_perf, args=(max_tasks, sm_num_of_tasks))
 
     j = 0
     print "[*] Starting processes..."
@@ -115,7 +116,7 @@ def multi_processing(process_number, target_object, exec_name, exec_list, exec_p
     while True:
         if num_of_fin == num_of_processes:
             break
-        if j == num_of_processes-num_of_fin:
+        if j == num_of_processes - num_of_fin:
             print "[*] Done..."
             printPerf_process.start()
             for i in range(num_of_processes):
