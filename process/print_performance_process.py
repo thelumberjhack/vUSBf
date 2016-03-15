@@ -7,31 +7,29 @@
 """
 __author__ = 'Sergej Schumilo'
 
+import datetime
+import os
 import signal
 import sys
-import os
 import time
-import datetime
 
 sys.path.append(os.path.abspath('../'))
 import config
-
 
 
 def signal_handler(signal, frame):
     sys.exit(0)
 
 
-def getTime(timeValue):
-    HOUR = 3600
-    return "[" + str(int(str(datetime.datetime.fromtimestamp(timeValue).strftime('%j')),10)-1) + str(datetime.datetime.fromtimestamp(timeValue-HOUR).strftime(':%H:%M:%S')) + "]"
-
-def getTimeDate(timeValue):
-    return "[" + str(datetime.datetime.fromtimestamp(timeValue).strftime('%d/%m/%y:%H:%M:%S')) + "]"
+def get_time(time_value):
+    return "[{}]".format(datetime.timedelta(seconds=time_value))
 
 
-def printPerf_Server(max_num_of_tasks, timeout, connection_list):
-    # print "INFO_THREAD"
+def get_time_date(time_value):
+    return "[{}]".format(datetime.datetime.fromtimestamp(time_value).strftime('%d/%m/%y:%H:%M:%S'))
+
+
+def print_perf_server(max_num_of_tasks, timeout, connection_list):
     start_time = time.time()
 
     while True:
@@ -54,12 +52,11 @@ def printPerf_Server(max_num_of_tasks, timeout, connection_list):
             else:
                 print "Condition: dead  \t",
             print "Jobs Done: " + str(element[1].value) + "  \t",
-            print "'Connection Time: " + getTimeDate(element[3])
+            print "'Connection Time: " + get_time_date(element[3])
         print ""
-            #print element[1].value
 
 
-def printPerf(max_num_of_tasks, sm_tasks_num):
+def print_perf(max_num_of_tasks, sm_tasks_num):
     signal.signal(signal.SIGINT, signal_handler)
     start_time = time.time()
     old = 0
@@ -67,8 +64,10 @@ def printPerf(max_num_of_tasks, sm_tasks_num):
         tmp = sm_tasks_num.value
 
         if tmp == max_num_of_tasks and max_num_of_tasks != 0:
-            print getTimeDate(time.time()) + "\t Running time: " + getTime(time.time() - start_time )
+            # We are done with the tasks, display final time
+            print("{}\t Running time: {}".format(get_time_date(time.time()), get_time(time.time() - start_time)))
             return
+
         else:
             new_time = time.time()
             raw_value = float(tmp) / (float(new_time) - float(start_time))
@@ -80,19 +79,30 @@ def printPerf(max_num_of_tasks, sm_tasks_num):
                 remaining_time = 0.0
 
             if remaining_time != 0.0 and max_num_of_tasks != 0:
-                print getTimeDate(time.time()) + "\t" + str(value) + " t/s  " + "\tREAL: " + str(
-                    round(float((tmp - old) / (float(config.PRINT_PERFORMANCE_TIMEOUT))), 2)) + " t/s" + "  \t" + str(
-                    tmp) + "/" + str(max_num_of_tasks) + "  \t running time: " + getTime(
-                    time.time() - start_time) + "\t remaining time: " + getTime(remaining_time )
+                progress = "{} {} t/s \tREAL:\t{}t/s \ttc:\t{}/{} \trunning time:\t{} \tETA:\t{}".format(
+                    get_time_date(time.time()),
+                    value,
+                    round(float((tmp - old) / (float(config.PRINT_PERFORMANCE_TIMEOUT))), 2),
+                    tmp,
+                    max_num_of_tasks,
+                    get_time(time.time() - start_time),
+                    get_time(remaining_time)
+                )
+                print(progress)
+
             else:
                 value = max_num_of_tasks
                 if max_num_of_tasks == 0:
                     value = '-'
-                print getTimeDate(time.time()) + "\t" + "\tREAL: " + str(
-                    round(float((tmp - old) / (float(config.PRINT_PERFORMANCE_TIMEOUT))), 2)) + " t/s" + "  \t" + str(
-                    tmp) + "/" + str(value) + "\t running time: " + getTime(time.time() - start_time )
+                progress = "{} REAL:\t{}t/s \ttc:\t{}/{} \ttime elapsed:\t{}".format(
+                    get_time_date(time.time()),
+                    round(float((tmp - old) / (float(config.PRINT_PERFORMANCE_TIMEOUT))), 2),
+                    tmp,
+                    value,
+                    get_time(time.time() - start_time),
+                )
+                print(progress)
 
             time.sleep(config.PRINT_PERFORMANCE_TIMEOUT)
 
         old = tmp
-
