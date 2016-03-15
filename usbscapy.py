@@ -87,11 +87,18 @@ usbredir_caps_enum = {
 
 
 # DO NOT FUZZ THE FOLLOWING REDIR SPECIFIC PACKAGES! FUZZING WILL CAUSE IN QEMU CRASH!
-class usbredirheader(Packet):
+class usbredirheader_32(Packet):
     name = "UsbredirPacket"
     fields_desc = [LEIntEnumField("Htype", -1, usbredir_type_enum),
                    LEIntField("HLength", 0),
                    LEIntField("Hid", -1)]
+
+
+class usbredirheader(Packet):
+    name = "UsbredirPacket"
+    fields_desc = [LEIntEnumField("Htype", -1, usbredir_type_enum),
+                   LEIntField("HLength", 0),
+                   XLongField("Hid", -1)]
 
 # Redir Packet No. 0 (redir hello)
 class hello_redir_header(Packet):
