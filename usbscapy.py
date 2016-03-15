@@ -32,36 +32,38 @@ class XLEIntField(LEIntField, XIntField):
 ####### REDIR SPECIFIC STUFF #######
 ####################################
 
-usbredir_type_enum = {  # CONTROL PACKETS
-                        0: "hello",
-                        1: "device_connect",
-                        2: "device_disconnect",
-                        3: "reset",
-                        4: "interface_info",
-                        5: "ep_info",
-                        6: "set_configuration",
-                        7: "get_configuration",
-                        8: "configuration_status",
-                        9: "set_alt_setting",
-                        10: "get_alt_setting",
-                        11: "alt_setting_status",
-                        12: "start_iso_stream",
-                        13: "stop_iso_stream",
-                        14: "iso_stream_status",
-                        15: "start_interrupt_receiving",
-                        16: "stop_interrupt_receiving",
-                        17: "interrupt_receiving_status",
-                        18: "alloc_bulk_streams",
-                        19: "free_bulk_streams",
-                        20: "bulk_streams_status",
-                        21: "cancel_data_packet",
-                        22: "filter_reject",
-                        23: "filter_filter",
-                        24: "device_disconnect_ack",  # DATA PACKETS
-                        100: "data_control_packet",
-                        101: "data_bulk_packet",
-                        102: "data_iso_packet",
-                        103: "data_interrupt_packet"}
+usbredir_type_enum = {
+    # CONTROL PACKETS
+    0: "hello",
+    1: "device_connect",
+    2: "device_disconnect",
+    3: "reset",
+    4: "interface_info",
+    5: "ep_info",
+    6: "set_configuration",
+    7: "get_configuration",
+    8: "configuration_status",
+    9: "set_alt_setting",
+    10: "get_alt_setting",
+    11: "alt_setting_status",
+    12: "start_iso_stream",
+    13: "stop_iso_stream",
+    14: "iso_stream_status",
+    15: "start_interrupt_receiving",
+    16: "stop_interrupt_receiving",
+    17: "interrupt_receiving_status",
+    18: "alloc_bulk_streams",
+    19: "free_bulk_streams",
+    20: "bulk_streams_status",
+    21: "cancel_data_packet",
+    22: "filter_reject",
+    23: "filter_filter",
+    24: "device_disconnect_ack",  # DATA PACKETS
+    100: "data_control_packet",
+    101: "data_bulk_packet",
+    102: "data_iso_packet",
+    103: "data_interrupt_packet"
+}
 
 
 usbredir_caps_enum = {
