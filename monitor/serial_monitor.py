@@ -2,10 +2,6 @@
 # coding: utf-8
 #
 # Author: Yannick Formaggio
-"""
-Description of the python module to be provided here
-
-"""
 import sys
 import socket
 import config
