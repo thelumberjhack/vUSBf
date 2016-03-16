@@ -7,7 +7,6 @@
 """
 __author__ = 'Sergej Schumilo'
 
-import struct
 from scapy.fields import *
 from scapy.packet import *
 
