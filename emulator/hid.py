@@ -11,7 +11,7 @@ import os.path, sys
 from enumeration import enumeration
 
 sys.path.append(os.path.abspath('../'))
-from usbparser import *
+from usb_parser import *
 from descFuzzer import *
 
 
@@ -41,7 +41,7 @@ class hid(enumeration):
 
     def _calc_response(self, data):
 
-        scapy_data = usbredir_parser(data).getScapyPacket()
+        scapy_data = USBRedirParser(data).get_scapy_packet()
         packet_length = 0
         extra_payload = None
 

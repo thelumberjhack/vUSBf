@@ -13,7 +13,7 @@ from emulator.enumeration_abortion import abortion_enumeration
 from emulator.hid import hid
 from fuzzer import fuzzer
 from lsusb_description_parser import LinuxLSUSBDescriptionParser
-from usbparser import *
+from usb_parser import *
 
 
 class USBEmulator(object):
@@ -82,6 +82,7 @@ class USBEmulator(object):
             return False
         r_value = self.__connection_loop(connection_to_victim)
         self.__print_data(self.__send_data(self.__get_disconnect_packet(), connection_to_victim), False)
+        connection_to_victim.close()
         return r_value
 
     def __get_hello_packet(self):
@@ -143,9 +144,8 @@ class USBEmulator(object):
             self.__print_data(self.__send_data(self.__get_if_info_packet(), connection_to_victim), False)
             self.__print_data(self.__send_data(self.__get_ep_info_packet(), connection_to_victim), False)
             self.__print_data(self.__send_data(self.__get_connect_packet(), connection_to_victim), False)
-        except Exception as e:
-            print "IN connection loop"
-            print e
+
+        except Exception:
             return False
 
         for _ in range(config.MAX_PACKETS):
@@ -156,12 +156,9 @@ class USBEmulator(object):
                     return True
                 raw_data = self.__recv_data_dont_print(new_packet.HLength, connection_to_victim)
                 raw_data = str(new_packet) + raw_data
-                new_packet = usbredir_parser(raw_data).getScapyPacket()
-            except Exception as e:
-                print "In looper"
-                import sys, traceback
-                traceback.print_exc()
-                print e
+                new_packet = USBRedirParser(raw_data).get_scapy_packet()
+
+            except Exception:
                 return True
 
             # hello packet
@@ -181,6 +178,7 @@ class USBEmulator(object):
                 new_packet.HLength += 1
                 new_packet.payload = Raw('\x00' + str(new_packet.payload))
                 self.__print_data(self.__send_data(str(new_packet), connection_to_victim), False)
+                connection_to_victim.settimeout(0.5)
 
             # start_interrupt_receiving packet
             elif new_packet.Htype == 15:

@@ -12,7 +12,7 @@ import os.path, sys, time, random
 from emulator import emulator
 
 sys.path.append(os.path.abspath('../'))
-from usbparser import *
+from usb_parser import *
 from descFuzzer import *
 
 
@@ -36,7 +36,7 @@ class enumeration(emulator):
         return extra_payload
 
     def _calc_response(self, data):
-        scapy_data = usbredir_parser(data).getScapyPacket()
+        scapy_data = USBRedirParser(data).get_scapy_packet()
         packet_length = 0
         extra_payload = None
 

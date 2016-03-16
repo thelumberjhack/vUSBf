@@ -8,19 +8,20 @@
 __author__ = 'Sergej Schumilo'
 
 from multiprocessing import Process, Value, Queue, Semaphore
-from qemu import qemu
-from process import process
-from print_performance_process import *
-import signal
-import time
+
 from clustering.network_task_requester import start_network_task_requester
+from print_performance_process import *
+from process import process
+from qemu import qemu
 
 process_list = None
 printPerf_process = None
 network_requester_process = None
 
+
 def signal_handler(signal, frame):
     kill_all()
+
 
 def kill_all():
     global process_list
@@ -60,9 +61,10 @@ def client(process_number, target_object, host, port, reload_test):
     for i in range(number_of_threads):
         queue_list.append(Queue())
         qemu_object = qemu("configurations/" + target_object, "/tmp/vusbf_" + str(i) + "_socket", i)
-        process_list.append(Process(target=process, args=("t" + str(i), qemu_object, sm_num_of_tasks, i, info_queue, queue_list[i], reload_test, sem, process_lock)))
+        process_list.append(Process(target=process, args=(
+        "t" + str(i), qemu_object, sm_num_of_tasks, i, info_queue, queue_list[i], reload_test, sem, process_lock)))
 
-    printPerf_process = Process(target=printPerf, args=(0, sm_num_of_tasks))
+    printPerf_process = Process(target=print_perf, args=(0, sm_num_of_tasks))
 
     payload_queue = Queue()
     request_queue = Queue()
@@ -77,7 +79,8 @@ def client(process_number, target_object, host, port, reload_test):
     time.sleep(config.PROCESS_STARTUP_TIME)
 
     # start network task requester
-    network_requester_process = Process(target=start_network_task_requester, args=(host, port, "sdsds", "sasas", sm_num_of_tasks, info_queue, payload_queue, request_queue, 1337, 2))
+    network_requester_process = Process(target=start_network_task_requester, args=(
+    host, port, "sdsds", "sasas", sm_num_of_tasks, info_queue, payload_queue, request_queue, 1337, 2))
     network_requester_process.start()
 
     num_of_fin = 0
@@ -87,7 +90,7 @@ def client(process_number, target_object, host, port, reload_test):
     while True:
         if num_of_fin == num_of_processes:
             break
-        if j == num_of_processes-num_of_fin:
+        if j == num_of_processes - num_of_fin:
             print "[*] Done..."
             printPerf_process.start()
             for i in range(num_of_processes):

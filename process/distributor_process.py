@@ -7,13 +7,13 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from clustering.network_task_distributor import process
 from multiprocessing import Process, Value, Queue
 from threading import Thread
-#from fuzz_configuration.xml_parser import xml_parser
-from test_generation.XMLParser import  xml_parser
-from random import shuffle
-from print_performance_process import printPerf_Server
+
+from clustering.network_task_distributor import process
+# from fuzz_configuration.xml_parser import xml_parser
+from test_generation.XMLParser import xml_parser
+from print_performance_process import print_perf_server
 import signal
 import config
 
@@ -21,11 +21,14 @@ server_process_list = []
 print_perf_process = None
 dist_process = None
 
+
 def signal_handler2(signal, frame):
     exit(0)
 
+
 def signal_handler(signal, frame):
     kill_all()
+
 
 def kill_all_process():
     global server_process_list
@@ -33,6 +36,7 @@ def kill_all_process():
         if e is not None:
             if e.is_alive():
                 e.terminate()
+
 
 def kill_all():
     global dist_process
@@ -45,12 +49,13 @@ def kill_all():
             print "KILLKILL"
     sys.exit(0)
 
+
 def distributor_process(host, port, info_queue, payload_queue):
     global server_process_list, print_perf_process
     signal.signal(signal.SIGINT, signal_handler2)
 
     perf_list = []
-    print_perf_process = Thread(target=printPerf_Server, args=(0, 10, perf_list)).start()
+    print_perf_process = Thread(target=print_perf_server, args=(0, 10, perf_list)).start()
 
     while True:
         try:
