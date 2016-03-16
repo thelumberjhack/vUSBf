@@ -64,7 +64,6 @@ usbredir_type_enum = {
     103: "data_interrupt_packet"
 }
 
-
 usbredir_caps_enum = {
     # Supports USB 3 bulk streams
     0: "usb_redir_cap_bulk_streams",
@@ -99,18 +98,19 @@ class usbredirheader(Packet):
                    LEIntField("HLength", 0),
                    XLongField("Hid", -1)]
 
+
 # Redir Packet No. 0 (redir hello)
 class hello_redir_header(Packet):
     name = "Hello_Packet"
     fields_desc = [
-                    StrLenField("version", "", length_from=64),  # StrLenField("caps", "", length_from=4)]
-                    LEIntField("capabilites", 1)
-                  ]
+        StrLenField("version", "", length_from=64),  # StrLenField("caps", "", length_from=4)]
+        LEIntField("capabilites", 1)
+    ]
 
     def print_capabilities(self):
-     for cap, capability_name in usbredir_caps_enum:
-       if self.capabilities & (1 << (cap % 32)) > 0:
-         print "Has capability: "  + capability_name
+        for cap, capability_name in usbredir_caps_enum:
+            if self.capabilities & (1 << (cap % 32)) > 0:
+                print "Has capability: " + capability_name
 
 
 class hello_redir_header_host(Packet):
@@ -146,7 +146,7 @@ class ep_info_redir_header(Packet):
     fields_desc = [FieldListField("ep_type", None, ByteEnumField("type_value", 0, {0: "type_control",
                                                                                    1: "type_iso",
                                                                                    2: "type interrupt",
-                                                                                   255: "type invalid", })
+                                                                                   255: "type invalid",})
                                   , length_from=lambda p: 32),
                    FieldListField("interval", None, ByteField("Value", 0), length_from=lambda p: 32),
                    FieldListField("interface", None, ByteField("Value", 0), length_from=lambda p: 32),
@@ -192,19 +192,18 @@ class data_interrupt_redir_header(Packet):
 
 
 redir_specific_type = {
-                       0: hello_redir_header,
-                       1: connect_redir_header,
-                       4: interface_info_redir_header,
-                       5:  ep_info_redir_header,
-                       100: data_control_redir_header,
-                       101: data_bulk_redir_header,
-                       102: data_iso_redir_header,
-                       103: data_interrupt_redir_header
-                      }
+    0: hello_redir_header,
+    1: connect_redir_header,
+    4: interface_info_redir_header,
+    5: ep_info_redir_header,
+    100: data_control_redir_header,
+    101: data_bulk_redir_header,
+    102: data_iso_redir_header,
+    103: data_interrupt_redir_header
+}
 
-
-#Layer binding doesn't appear to be working properly
-#for redir_type_id, redir_control_pkg in redir_specific_type.iteritems():
+# Layer binding doesn't appear to be working properly
+# for redir_type_id, redir_control_pkg in redir_specific_type.iteritems():
 #  bind_layers( usbredirheader, redir_control_pkg, Htype = redir_type_id)
 
 
@@ -214,23 +213,23 @@ redir_specific_type = {
 ##################################
 
 _setup_bRequest_types = {
-    0x00:   "GET_STATUS",
-    0x01:   "CLEAR_FEATURE",
-    0x03:   "SET_FEATURE",
-    0x05:   "SET_ADDRESS",
-    0x06:   "GET_DESCRIPTOR",
-    0x07:   "SET_DESCRIPTOR",
-    0x08:   "GET_CONFIGURATION",
-    0x09:   "SET_CONFIGURATION",
+    0x00: "GET_STATUS",
+    0x01: "CLEAR_FEATURE",
+    0x03: "SET_FEATURE",
+    0x05: "SET_ADDRESS",
+    0x06: "GET_DESCRIPTOR",
+    0x07: "SET_DESCRIPTOR",
+    0x08: "GET_CONFIGURATION",
+    0x09: "SET_CONFIGURATION",
 }
 
-#bmAttributes is an 8-bit flag field.
+# bmAttributes is an 8-bit flag field.
 _config_bmAttributes_names = [
     # D4..0 Reserved, set to 0.
     "Reserved0", "Reserved1", "Reserved2", "Reserved3", "Reserved4",
-    "RemoteWakeup", # D5 Remote Wakeup
+    "RemoteWakeup",  # D5 Remote Wakeup
     "SelfPowered",  # D6 Self Powered
-    "Reserved7",    # D7 Reserved, set to 1. (USB 1.0 Bus Powered)
+    "Reserved7",  # D7 Reserved, set to 1. (USB 1.0 Bus Powered)
 ]
 
 
@@ -238,29 +237,31 @@ _config_bmAttributes_names = [
 class usb_header(Packet):
     name = "USB_Packet"
     fields_desc = [
-                     XLongField("id", 0xffff88003720d540),
-                     ByteField("type", 43),
-                     ByteField("transfer type", 2),
-                     ByteField("endpoint", 80),
-                     ByteField("device", 0),
-                     LEShortField("bus_id", 0),
-                     ByteField("device_setup_request", 0),
-                     ByteField("data_present", 0),
-                     LELongField("urb_sec", 0),
-                     LEIntField("urb_usec", 0),
-                     LEIntField("urb_status", 0),
-                     LEIntField("urb_length", 0),
-                     LEIntField("data_length", 0)
-                   ]
+        XLongField("id", 0xffff88003720d540),
+        ByteField("type", 43),
+        ByteField("transfer type", 2),
+        ByteField("endpoint", 80),
+        ByteField("device", 0),
+        LEShortField("bus_id", 0),
+        ByteField("device_setup_request", 0),
+        ByteField("data_present", 0),
+        LELongField("urb_sec", 0),
+        LEIntField("urb_usec", 0),
+        LEIntField("urb_status", 0),
+        LEIntField("urb_length", 0),
+        LEIntField("data_length", 0)
+    ]
 
 
 # Generic USB Descriptor Header
 class usb_generic_descriptor_header(Packet):
     name = "USB_GENERIC_DESCRIPTOR_HEADER"
     fields_desc = [
-                     ByteField("bLength", 0),
-                     XByteField("bDescriptorType", 0x1)
-                  ]
+        ByteField("bLength", 0),
+        XByteField("bDescriptorType", 0x1)
+    ]
+
+
 """
 class USBSetup(Packet):
     '''
@@ -318,13 +319,13 @@ class USBDeviceDescriptor(Packet):
                    XLEShortField("isVendor", 0x0),
                    XLEShortField("idProduct", 0x0),
                    XLEShortField("bcdDevice", 0x0),
-                   #Three string descriptors exist to provide details of the manufacturer,
+                   # Three string descriptors exist to provide details of the manufacturer,
                    # product and serial number. There is no requirement to have string
                    # descriptors. If none is present, a index of zero should be used.
                    ByteField("iManufacturer", 0),
                    ByteField("iProduct", 0),
                    ByteField("iSerialNumber", 0),
-                   #bNumConfigurations defines num. of configs the device supports at its current speed.
+                   # bNumConfigurations defines num. of configs the device supports at its current speed.
                    ByteField("bNumConfigurations", 1)]
 
     def answers(self, other):
@@ -333,10 +334,10 @@ class USBDeviceDescriptor(Packet):
         and it is a device descriptor request.
         '''
         if isinstance(other, USBSetup):
-            #Standard Request and Send Descriptor and Device Descriptor Request
-            if other.bmRequestType & 0x60 == 0x00 and  \
-               other.bRequest == SR_GET_DESCRIPTOR and \
-               other.wValueH == GD_DEVICE:
+            # Standard Request and Send Descriptor and Device Descriptor Request
+            if other.bmRequestType & 0x60 == 0x00 and \
+                            other.bRequest == SR_GET_DESCRIPTOR and \
+                            other.wValueH == GD_DEVICE:
                 return True
         return False
 
@@ -345,6 +346,7 @@ class USBDeviceDescriptor(Packet):
 
     def getDescLen(self):
         return self.bLength
+
 
 # USB Configuration Descriptor
 class USBConfigurationDescriptor(Packet):
@@ -358,10 +360,10 @@ class USBConfigurationDescriptor(Packet):
     name = "USB_Configuration_Descriptor"
     fields_desc = [ByteField("bLength", 9),  # Size of Descriptor in Bytes
                    XByteField("bDescriptorType", 0x02),  # Configuration Descriptor (0x02)
-                   #The wTotalLength field reflects the number of bytes in the hierarchy.
+                   # The wTotalLength field reflects the number of bytes in the hierarchy.
                    XLEShortField("wTotalLength", 0),  # Total length in bytes of data returned
                    ByteField("bNumInterfaces", None),  # Number of Interfaces
-                   #bConfigurationValue is used by the SetConfiguration request to select this configuration.
+                   # bConfigurationValue is used by the SetConfiguration request to select this configuration.
                    ByteField("bConfigurationValue", None),  # Value to use as an argument to select this configuration
                    ByteField("iConfiguration", None),  # Index of String Descriptor describing this configuration
                    FlagsField("bmAttributes", 0b11100000, 8, [
@@ -375,7 +377,7 @@ class USBConfigurationDescriptor(Packet):
                        "Reserved_D7",  # D7 Reserved: Must be 1 for USB1.1 and higher
                    ]),
                    ByteField("bMaxPower", None)  # Maximum Power consumption in 2mA units
-    ]
+                   ]
 
     def answers(self, other):
         '''
@@ -383,10 +385,10 @@ class USBConfigurationDescriptor(Packet):
         and it is a device descriptor request.
         '''
         if isinstance(other, USBSetup):
-            #Standard Request and Send Descriptor and Configuration Request
-            if other.bmRequestType & 0x60 == 0x00 and  \
-               other.bRequest == SR_GET_DESCRIPTOR and \
-               other.wValueH == GD_CONFIGURATION:
+            # Standard Request and Send Descriptor and Configuration Request
+            if other.bmRequestType & 0x60 == 0x00 and \
+                            other.bRequest == SR_GET_DESCRIPTOR and \
+                            other.wValueH == GD_CONFIGURATION:
                 return True
         return False
 
@@ -396,24 +398,25 @@ class USBConfigurationDescriptor(Packet):
     def getDescLen(self):
         return self.wTotalLength
 
+
 # USB Interface_Descriptor
 class USBInterfaceDescriptor(Packet):
     '''One of the descriptors that can be nested into a full Configuration Descriptor.'''
     name = "USB_Interface_Descriptor"
     fields_desc = [ByteField("bLength", 0x9),  # Size of Descriptor in Bytes (9 Bytes)
                    XByteField("bDescriptorType", 0x04),  # Configuration Descriptor (0x04)
-                   #bInterfaceNumber indicates the index of the interface descriptor.
+                   # bInterfaceNumber indicates the index of the interface descriptor.
                    # Is zero based, and incremented once for each new interface descriptor.
                    ByteField("bInterfaceNumber", None),  # Number of Interface
                    ByteField("bAlternateSetting", None),  # Value used to select alternative setting
-                   #bNumEndpoints indicates the number of endpoints used by the interface.
+                   # bNumEndpoints indicates the number of endpoints used by the interface.
                    # Value should exclude endpoint zero, is used to indicate the number of endpoint descriptors to follow.
                    ByteField("bNumEndpoints", None),  # Number of Endpoints used for this interface
                    XByteField("bInterfaceClass", None),  # Class Code [0x08: MASSSTORAGE, ...]
                    XByteField("bInterfaceSubClass", None),  # Subclass Code
                    XByteField("bInterfaceProtocol", None),  # Protocol Code
                    ByteField("iInterface", None)  # Index of String Descriptor describing this interface
-    ]
+                   ]
 
 
 # USB Endpoint Descriptors
@@ -422,21 +425,20 @@ class USBEndpointDescriptor(Packet):
     name = "USB_Endpoint_Descriptor"
     fields_desc = [ByteField("bLength", 7),  # Size of Descriptor in Bytes (7 Bytes)
                    XByteField("bDescriptorType", 0x05),  # Configuration Descriptor (0x05) #type = endpoint
-                   #Endpoint Address
-                   #Bits 0..3b Endpoint Number.
-                   #Bits 4..6b Reserved. Set to Zero
-                   #Bits 7 Direction 0 = Out, 1 = In (Ignored for Control Endpoints)
-                   XByteField("bEndpointAddress", 0x83), # bEndpointAddress (default EP3-IN)
-                   ByteField("bmAttributes", 3),         # 3=interrupt
-                   #TODO split bmAttributes by flags, but it changes based on endpoint type
-                   #bmAttributes: Bits 0..1 Transfer Type
-                   #BitEnumField("bmAttributes_transfertype", 0b11, 2, \
+                   # Endpoint Address
+                   # Bits 0..3b Endpoint Number.
+                   # Bits 4..6b Reserved. Set to Zero
+                   # Bits 7 Direction 0 = Out, 1 = In (Ignored for Control Endpoints)
+                   XByteField("bEndpointAddress", 0x83),  # bEndpointAddress (default EP3-IN)
+                   ByteField("bmAttributes", 3),  # 3=interrupt
+                   # TODO split bmAttributes by flags, but it changes based on endpoint type
+                   # bmAttributes: Bits 0..1 Transfer Type
+                   # BitEnumField("bmAttributes_transfertype", 0b11, 2, \
                    #    {0x0:"Control", 0x1:"Isochronous", 0x2:"Bulk", 0x3:"Interrupt"}),
                    LEShortField("wMaxPacketSize", None),
                    # Maximum Packet Size this endpoint is cabable of sending or recving
                    ByteField("bInterval", None)  # Interval for polling endpoint data transfer. Value in frame counts
-    ]
-
+                   ]
 
 
 class USBStringDescriptor(Packet):
@@ -447,10 +449,11 @@ class USBStringDescriptor(Packet):
     '''
     name = "USB_String_Descriptor"
     fields_desc = [
-                   FieldLenField("bLength", None, length_of="string", fmt="B", adjust=lambda pkt,x: x+2),
-                   ByteField("bDescriptorType", 0x03), # 3=String
-                   StrLenField("string", "", length_from=lambda pkt: pkt.bLength-2),
+        FieldLenField("bLength", None, length_of="string", fmt="B", adjust=lambda pkt, x: x + 2),
+        ByteField("bDescriptorType", 0x03),  # 3=String
+        StrLenField("string", "", length_from=lambda pkt: pkt.bLength - 2),
     ]
+
 
 class USBStringDescriptorLanguage(USBStringDescriptor):
     '''
@@ -461,16 +464,16 @@ class USBStringDescriptorLanguage(USBStringDescriptor):
     '''
     name = "USB_String_Descriptor_LangID"
     fields_desc = [
-        FieldLenField("bLength", None, length_of="wLANGID", fmt="B", adjust=lambda pkt,x: x+2),
-        ByteField("bDescriptorType", 0x03), # 3=String
+        FieldLenField("bLength", None, length_of="wLANGID", fmt="B", adjust=lambda pkt, x: x + 2),
+        ByteField("bDescriptorType", 0x03),  # 3=String
         # TODO implement proper list of enumerated shorts for language codes
-        #FieldListField("string", [XLEShortField("language", 0x0409)], XLEShortField, count_from=lambda pkt:(pkt.bLength-2)/2),
-        StrLenField("wLANGID", "\x09\x04", length_from=lambda pkt: pkt.bLength-2), #default English-United States
+        # FieldListField("string", [XLEShortField("language", 0x0409)], XLEShortField, count_from=lambda pkt:(pkt.bLength-2)/2),
+        StrLenField("wLANGID", "\x09\x04", length_from=lambda pkt: pkt.bLength - 2),  # default English-United States
     ]
 
     def addLanguage(self, hexcode):
         packed = struct.pack("<H", hexcode)
-        if packed not in self.string: #TODO make search based on actual fields
+        if packed not in self.string:  # TODO make search based on actual fields
             self.string += packed
             return True
         else:
@@ -482,12 +485,12 @@ class USBHIDDescriptor(Packet):
     name = "USB HID Descriptor"
     fields_desc = [
         ByteField("bLength", 0x09),
-        XByteField("bDescriptorType", 0x21),# type 33d=HID
-        XLEShortField("bcdHID", 0x0110),    # bcdHID(L/H) Rev 1.1
-        ByteField("bCountryCode", 0),       # 0=None
-        ByteField("bNumDescriptors", 1),    # 1 report descriptor
-        XByteField("bDescriptorType0", 0x22), # 0x22=report TODO name was overlapping!
-        LEShortField("wDescriptorLength", 43), #report descriptor size is 43 bytes
+        XByteField("bDescriptorType", 0x21),  # type 33d=HID
+        XLEShortField("bcdHID", 0x0110),  # bcdHID(L/H) Rev 1.1
+        ByteField("bCountryCode", 0),  # 0=None
+        ByteField("bNumDescriptors", 1),  # 1 report descriptor
+        XByteField("bDescriptorType0", 0x22),  # 0x22=report TODO name was overlapping!
+        LEShortField("wDescriptorLength", 43),  # report descriptor size is 43 bytes
     ]
 
 
@@ -495,7 +498,7 @@ class USBHIDReportExtension(Packet):
     name = "USB_HID_Report_Extension"
     fields_desc = [XByteField("bDescriptorType2", 0x22),  # 0x22 REPORT DESCRIPTOR # 0x23 PYSICAL DESCRIPTOR
                    LEShortField("wDescriptorLength", 0x00)
-    ]
+                   ]
 
 
 class USBHIDReportDescriptor(Packet):
@@ -504,14 +507,13 @@ class USBHIDReportDescriptor(Packet):
 
 
 descriptor_types = {
-                        0x01: USBDeviceDescriptor,
-                        0x02: USBConfigurationDescriptor,
-                        0x03: USBStringDescriptor,
-                        0x04: USBInterfaceDescriptor,
-                        0x05: USBEndpointDescriptor,
-                        0x09: USBHIDDescriptor
-                   }
-
+    0x01: USBDeviceDescriptor,
+    0x02: USBConfigurationDescriptor,
+    0x03: USBStringDescriptor,
+    0x04: USBInterfaceDescriptor,
+    0x05: USBEndpointDescriptor,
+    0x09: USBHIDDescriptor
+}
 
 ## PROTOTYPE FOR USB_HUB_DESCRIPTOR ##
 ##
@@ -535,33 +537,37 @@ descriptor_types = {
 # dCBWSignatur
 dCBWSignature_magic_number = 0x43425355
 
-#dCSWSignatur
+# dCSWSignatur
 dCSWSignature_magic_number = 0x53425355
+
 
 # Command Generic Header
 class massstorage_generic(Packet):
-                name = "Massstorage_Generic"
-                fields_desc = [ XLEIntField("dSignature", 0)]
+    name = "Massstorage_Generic"
+    fields_desc = [XLEIntField("dSignature", 0)]
+
 
 # Command Block Wrapper  (CBW)          [SIZE: 12 Bytes]
 class massstorage_cbw(Packet):
-                                name = "Massstorage_CBW"
-                                fields_desc = [ XLEIntField("dCBWSignature", 0),
-                                IntField("dCBWTag", None),
-                                XLEIntField("dCBWDataTransferLength", None),
-                                ByteField("bmCBWFlags", None),
-                                ByteField("bCBWLUN", None),
-                                ByteField("bCBWCBLength", None)
-                                ]
+    name = "Massstorage_CBW"
+    fields_desc = [XLEIntField("dCBWSignature", 0),
+                   IntField("dCBWTag", None),
+                   XLEIntField("dCBWDataTransferLength", None),
+                   ByteField("bmCBWFlags", None),
+                   ByteField("bCBWLUN", None),
+                   ByteField("bCBWCBLength", None)
+                   ]
+
 
 # Command Status Wrapper (CSW)
 class massstorage_csw(Packet):
-                name = "Masstorage_CSW"
-                fields_desc = [ XLEIntField("dCSWSignature", 0),
-                                IntField("dCSWTag", None),
-                                XLEIntField("dCSWDataResidue", None),
-                                                                ByteField("bCSWStatus", None)
-                                ]
+    name = "Masstorage_CSW"
+    fields_desc = [XLEIntField("dCSWSignature", 0),
+                   IntField("dCSWTag", None),
+                   XLEIntField("dCSWDataResidue", None),
+                   ByteField("bCSWStatus", None)
+                   ]
+
 
 ###################################
 ####### SCSI SPECIFIC STUFF #######
@@ -572,39 +578,42 @@ SCSI_INQUIRY_VENDOR_ID_LENGTH = 8
 SCSI_INQUIRY_PRODUCT_ID_LENGTH = 16
 SCSI_INQUIRY_PRODUCT_REVISION_LEVEL_LENGTH = 4
 
+
 # INQUIRY SCSI (SIZE: 36 Bytes)
 class scsi_inquiry(Packet):
-                name = "SCSI_Inquiry"
-                fields_desc = [ ByteField("peripheral", None),
-                                ByteField("RMB", None),
-                                ByteField("version", None),
-                                ByteField("?", None),
-                                ByteField("additional_length", None),
-                                ByteField("??", None),
-                                ByteField("???", None),
-                                ByteField("????", None),
+    name = "SCSI_Inquiry"
+    fields_desc = [ByteField("peripheral", None),
+                   ByteField("RMB", None),
+                   ByteField("version", None),
+                   ByteField("?", None),
+                   ByteField("additional_length", None),
+                   ByteField("??", None),
+                   ByteField("???", None),
+                   ByteField("????", None),
 
-                                StrFixedLenField("vendor_id", None, SCSI_INQUIRY_VENDOR_ID_LENGTH),
-                                StrFixedLenField("product_id", None, SCSI_INQUIRY_PRODUCT_ID_LENGTH),
-                                StrFixedLenField("product_revision_level", None, SCSI_INQUIRY_PRODUCT_REVISION_LEVEL_LENGTH)
-                                ]
+                   StrFixedLenField("vendor_id", None, SCSI_INQUIRY_VENDOR_ID_LENGTH),
+                   StrFixedLenField("product_id", None, SCSI_INQUIRY_PRODUCT_ID_LENGTH),
+                   StrFixedLenField("product_revision_level", None, SCSI_INQUIRY_PRODUCT_REVISION_LEVEL_LENGTH)
+                   ]
+
 
 # Raw INQUIRY SCSI
 class scsi_raw_inquiry(Packet):
-                                name = "SCSI_Raw_Inquiry"
-                                fields_desc = [ ByteField("peripheral", None),
-                                                                ByteField("RMB", None),
-                                                                ByteField("version", None),
-                                                                ByteField("?", None),
-                                                                ByteField("additional_length", None),
-                                                                ByteField("??", None),
-                                                                ByteField("???", None),
-                                                                ByteField("????", None),
-                                                                #PAYLOAD VENDOR ID[8] PRODUCT ID[16] PRODUCT REV[4]
-                                                                ]
+    name = "SCSI_Raw_Inquiry"
+    fields_desc = [ByteField("peripheral", None),
+                   ByteField("RMB", None),
+                   ByteField("version", None),
+                   ByteField("?", None),
+                   ByteField("additional_length", None),
+                   ByteField("??", None),
+                   ByteField("???", None),
+                   ByteField("????", None),
+                   # PAYLOAD VENDOR ID[8] PRODUCT ID[16] PRODUCT REV[4]
+                   ]
+
 
 # READ CAPICITY SCSI
-#class scsi_read_capicity(Packet):
+# class scsi_read_capicity(Packet):
 #               name = "SCSI_READ_CAPICITY"
 #               fields_desc = [ ByteField("opcode", 0x25),
 #                               ByteField("reserved", None),
@@ -616,55 +625,56 @@ class scsi_raw_inquiry(Packet):
 
 # READ CAPICITY SCSI RESONSE
 class scsi_read_capicity(Packet):
-                name = "SCSI_READ_CAPICITY_RESPONSE"
-                fields_desc = [ XLEIntField("returned_logic_block_addr", None),
-                                                XLEIntField("block_length", None) ]
+    name = "SCSI_READ_CAPICITY_RESPONSE"
+    fields_desc = [XLEIntField("returned_logic_block_addr", None),
+                   XLEIntField("block_length", None)]
+
 
 # MODE SELECT (6) SCSI RESPONSE
 class scsi_mode_6(Packet):
-                name = "SCSI_MODE_SELECT_(6)_RESPONSE"
-                fields_desc = [ ByteField("mode_data_length", None),
-                                ByteField("medium_field", None),
-                                ByteField("dev-specific_parameter", None),
-                                ByteField("block_desc_length", None) ]
+    name = "SCSI_MODE_SELECT_(6)_RESPONSE"
+    fields_desc = [ByteField("mode_data_length", None),
+                   ByteField("medium_field", None),
+                   ByteField("dev-specific_parameter", None),
+                   ByteField("block_desc_length", None)]
+
 
 # SCSI COMMAND LIST [OPCODE, NAME, SCAPYNAME]
-SCSI_COMMAND_LIST = [   ['\x04', "FORMAT UNIT", None],
-                                                ['\x12', "INQUIRY", scsi_inquiry],
-                                                ['\x15', "MODE SELECT (6)", scsi_mode_6],
-                                                ['\x55', "MODE SELECT (10)", None],
-                                                ['\x1a', "MODE SENSE (6)", scsi_mode_6],
-                                                ['\x5a', "MODE SENSE (10)", None],
-                                                ['\x1e', "PREVENT ALLOW MEDIUM REMOVAL", None],
-                                                ['\x08', "READ (6)", None],
-                                                ['\x28', "READ (10)", None],
-                                                ['\xa8', "READ (12)", None],
-                                                ['\x25', "READ CAPACITY (10)", scsi_read_capicity],
-                                                ['\x23', "READ FORMAT CAPACITY", None],
-                                                ['\x43', "READ TOC/PMA/ATIP", None],
-                                                ['\xa0', "REPORT LUNS", None],
-                                                ['\x03', "REQUEST SENSE", None],
-                                                ['\x1d', "SEND DIAGNOSITC", None],
-                                                ['\x1b', "START STOP UNIT", None],
-                                                ['\x35', "SYNCHRONIZE CACHE (10)", None],
-                                                ['\x00', "TEST UNIT READY", None],
-                                                ['\x2f', "VERIFY (10)", None],
-                                                ['\x0a', "WRITE (6)", None],
-                                                ['\x2a', "WRITE (10)", None],
-                                                ['\xaa', "WRITE (12)", None]
-                                ]
-
+SCSI_COMMAND_LIST = [['\x04', "FORMAT UNIT", None],
+                     ['\x12', "INQUIRY", scsi_inquiry],
+                     ['\x15', "MODE SELECT (6)", scsi_mode_6],
+                     ['\x55', "MODE SELECT (10)", None],
+                     ['\x1a', "MODE SENSE (6)", scsi_mode_6],
+                     ['\x5a', "MODE SENSE (10)", None],
+                     ['\x1e', "PREVENT ALLOW MEDIUM REMOVAL", None],
+                     ['\x08', "READ (6)", None],
+                     ['\x28', "READ (10)", None],
+                     ['\xa8', "READ (12)", None],
+                     ['\x25', "READ CAPACITY (10)", scsi_read_capicity],
+                     ['\x23', "READ FORMAT CAPACITY", None],
+                     ['\x43', "READ TOC/PMA/ATIP", None],
+                     ['\xa0', "REPORT LUNS", None],
+                     ['\x03', "REQUEST SENSE", None],
+                     ['\x1d', "SEND DIAGNOSITC", None],
+                     ['\x1b', "START STOP UNIT", None],
+                     ['\x35', "SYNCHRONIZE CACHE (10)", None],
+                     ['\x00', "TEST UNIT READY", None],
+                     ['\x2f', "VERIFY (10)", None],
+                     ['\x0a', "WRITE (6)", None],
+                     ['\x2a', "WRITE (10)", None],
+                     ['\xaa', "WRITE (12)", None]
+                     ]
 
 
 def main():
     # my code here
-  blah = usbredirheader() / hello_redir_header()
-  blah.show()
+    blah = usbredirheader() / hello_redir_header()
+    blah.show()
 
-  print str(blah)
+    print str(blah)
+
+
 #  usbredirheader(str(blah)).show()
 
 if __name__ == "__main__":
     main()
-
-
