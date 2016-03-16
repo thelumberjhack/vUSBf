@@ -35,7 +35,7 @@ class USBEmulator(object):
     def __init__(self, victim_address, address_type):
 
         if victim_address is None or address_type is None:
-            raise Exception("Victim address errror")
+            raise Exception("Victim address error")
 
         if address_type == 0:
             if len(victim_address) != 2:
@@ -81,10 +81,11 @@ class USBEmulator(object):
             print "Unable to connect to victim..."
             return False
         r_value = self.__connection_loop(connection_to_victim)
+        self.__print_data(self.__send_data(self.__get_disconnect_packet(), connection_to_victim), False)
         return r_value
 
     def __get_hello_packet(self):
-        pkt = usbredirheader()
+        pkt = usbredirheader_32()
         pkt.Htype = 0
         pkt.HLength = 68
         pkt.Hid = 0
@@ -97,6 +98,14 @@ class USBEmulator(object):
         pkt.HLength = 10
         pkt.Hid = 0
         pkt = pkt / Raw(str(self.connect_packet))
+        return str(pkt)
+
+    @staticmethod
+    def __get_disconnect_packet():
+        pkt = usbredirheader()
+        pkt.Htype = 2
+        pkt.HLength = 0
+        pkt.Hid = 0
         return str(pkt)
 
     def __get_if_info_packet(self):
@@ -141,7 +150,7 @@ class USBEmulator(object):
 
         for _ in range(config.MAX_PACKETS):
             try:
-                received_data = self.__recv_data(12, connection_to_victim)
+                received_data = self.__recv_data(16, connection_to_victim)
                 new_packet = usbredirheader(received_data)
                 if new_packet.Htype == -1:
                     return True
@@ -163,22 +172,21 @@ class USBEmulator(object):
             # reset packet
             elif new_packet.Htype == 3:
                 self.__print_data(str(new_packet), True)
-                self.__print_data(self.__send_data(self.__get_reset_packet(), connection_to_victim), False)
+                # self.__print_data(self.__send_data(self.__get_reset_packet(), connection_to_victim), False)
 
             # set_configuration packet
             elif new_packet.Htype == 6:
                 self.__print_data(str(new_packet), True)
                 new_packet.Htype = 8
-                new_packet.HLength = new_packet.HLength + 1
+                new_packet.HLength += 1
                 new_packet.payload = Raw('\x00' + str(new_packet.payload))
                 self.__print_data(self.__send_data(str(new_packet), connection_to_victim), False)
-                # connection_to_victim.settimeout(0.5)
 
             # start_interrupt_receiving packet
             elif new_packet.Htype == 15:
                 self.__print_data(str(new_packet), True)
                 new_packet.Htype = 17
-                new_packet.HLength = new_packet.HLength + 1
+                new_packet.HLength += 1
                 new_packet.payload = Raw('\x00' + str(new_packet.payload))
                 self.__print_data(self.__send_data(str(new_packet), connection_to_victim), False)
                 return True
