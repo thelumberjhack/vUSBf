@@ -13,20 +13,19 @@ sys.path.append(os.path.abspath('../'))
 import config
 
 
-class monitor(object):
+class Monitor(object):
     def __init__(self, qemu, filename):
-        if qemu == None:
+        if not qemu:
             raise Exception("qemu null pointer")
         self.qemu = qemu
-        if filename == None:
+        if not filename:
             raise Exception("filename null pointer")
         self.filename = filename
 
     def log_reload(self):
         if self.filename != "":
-            f = open(self.filename, "a")
-            f.write(config.MESSAGE_VM_RELOAD)
-            f.close()
+            with open(self.filename, "a") as log_file:
+                log_file.write(config.MESSAGE_VM_RELOAD)
 
     def monitor(self, title):
         pass

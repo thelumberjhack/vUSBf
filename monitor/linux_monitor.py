@@ -7,27 +7,28 @@
 """
 __author__ = 'Sergej Schumilo'
 
-from monitor import monitor
+from monitor import Monitor
 import fcntl
 from scapy.all import *
 sys.path.append(os.path.abspath('../'))
 import config
 
 
-class linux_monitor(monitor):
+class LinuxMonitor(Monitor):
     def __init__(self, qemu, filename):
-        super(linux_monitor, self).__init__(qemu, filename)
+        super(LinuxMonitor, self).__init__(qemu, filename)
 
     def monitor(self, title):
         return self.__monitor(title)[0]
 
-    def __non_block_read(self, output):
+    @staticmethod
+    def __non_block_read(output):
         fd = output.fileno()
         fl = fcntl.fcntl(fd, fcntl.F_GETFL)
         fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
         try:
             return output.read()
-        except:
+        except Exception:
             return ""
 
     def __monitor(self, title):
@@ -63,7 +64,7 @@ class linux_monitor(monitor):
         try:
             tmp_data = data.split("\r")[1].translate(None, "\n ").replace("(qemu)", "").replace("replay", "").replace(
                 "loadvm", "")
-        except:
+        except Exception:
             return False, ""
 
         if len(tmp_data) == 0:
