@@ -188,7 +188,7 @@ class qemu:
     def log_qemu_output_select(self, file_name, title):
         try:
             if self.monitor is None:
-                self.monitor = linux_monitor(self, file_name)
+                self.monitor = LinuxMonitor(self, file_name)
             return self.monitor.monitor(title)
         except:
             return False
